@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Good Thoughts</title>
+  <style>
+    /* CSS STYLES */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-gradient);
+      padding: 20px;
+    }
+
+    .app-container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 550px;
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .quote-box {
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border-left: 4px solid var(--primary);
+      transition: opacity 0.3s ease;
+    }
+
+    .quote-text {
+      font-size: 1.25rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .quote-author {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid #d1d5db;
+    }
+
+    button.secondary:hover {
+      background: #f3f4f6;
+      color: var(--text-main);
+    }
+
+    .favorites-list {
+      margin-top: 30px;
+      text-align: left;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 20px;
+    }
+
+    .favorites-list h2 {
+      font-size: 1.1rem;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+
+    .favorites-list ul {
+      list-style: none;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .favorites-list li {
+      font-size: 0.88rem;
+      padding: 8px 10px;
+      background: #f9fafb;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <h1>✨ Positive Thought Hub</h1>
+
+    <div class="quote-box" id="quote-box">
+      <p class="quote-text" id="quote-text">Loading daily thought...</p>
+      <p class="quote-author" id="quote-author"></p>
+    </div>
+
+    <div class="actions">
+      <button onclick="getRandomThought()">New Thought</button>
+      <button class="secondary" onclick="copyThought()">Copy</button>
+      <button class="secondary" onclick="saveFavorite()">❤️ Favorite</button>
+    </div>
+
+    <div class="favorites-list">
+      <h2>Saved Favorites (<span id="fav-count">0</span>)</h2>
+      <ul id="fav-items"></ul>
+    </div>
+  </div>
+
+  <script>
+    // JAVASCRIPT LOGIC
+    const thoughts = [
+      { text: "Your focus determines your reality. Concentrate on what truly matters.", author: "Mindful Living" },
+      { text: "Small, daily steps lead to massive, long-term success.", author: "Daily Motivation" },
+      { text: "Peace comes from within. Do not seek it without.", author: "Buddha" },
+      { text: "Kindness is a language that the deaf can hear and the blind can see.", author: "Mark Twain" },
+      { text: "Every day may not be good, but there is something good in every day.", author: "Alice Morse Earle" },
+      { text: "The best way to predict the future is to create it.", author: "Peter Drucker" },
+      { text: "Happiness is not by chance, but by choice.", author: "Jim Rohn" }
+    ];
+
+    let currentThoughtIndex = -1;
+    const favorites = [];
+
+    function getRandomThought() {
+      const quoteBox = document.getElementById('quote-box');
+      quoteBox.style.opacity = '0'; // Smooth fade-out transition
+
+      setTimeout(() => {
+        let randomIndex;
+        do {
+          randomIndex = Math.floor(Math.random() * thoughts.length);
+        } while (randomIndex === currentThoughtIndex && thoughts.length > 1);
+
+        currentThoughtIndex = randomIndex;
+        const current = thoughts[currentThoughtIndex];
+
+        document.getElementById('quote-text').innerText = `"${current.text}"`;
+        document.getElementById('quote-author').innerText = `— ${current.author}`;
+        quoteBox.style.opacity = '1'; // Fade-in
+      }, 200);
+    }
+
+    function copyThought() {
+      const current = thoughts[currentThoughtIndex];
+      const fullText = `"${current.text}" — ${current.author}`;
+      navigator.clipboard.writeText(fullText).then(() => {
+        alert("Thought copied to clipboard!");
+      });
+    }
+
+    function saveFavorite() {
+      if (currentThoughtIndex === -1) return;
+      const current = thoughts[currentThoughtIndex];
+      const fullText = `"${current.text}" — ${current.author}`;
+
+      if (!favorites.includes(fullText)) {
+        favorites.push(fullText);
+        updateFavoritesUI();
+      }
+    }
+
+    function updateFavoritesUI() {
+      const favList = document.getElementById('fav-items');
+      const favCount = document.getElementById('fav-count');
+      favList.innerHTML = '';
+
+      favorites.forEach(item => {
+        const li = document.createElement('li');
+        li.innerText = item;
+        favList.appendChild(li);
+      });
+
+      favCount.innerText = favorites.length;
+    }
+
+    // Load initial thought on launch
+    getRandomThought();
+  </script>
+</body>
+</html>
