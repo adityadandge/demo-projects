@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Real-Time Age Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #38bdf8;
+    }
+
+    .input-group {
+      margin-bottom: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    input[type="datetime-local"] {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="datetime-local"]:focus {
+      border-color: #38bdf8;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .metric-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .totals-container {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid #334155;
+    }
+
+    .totals-title {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .total-row:last-child {
+      border-bottom: none;
+    }
+
+    .total-value {
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>⏳ Real-Time Age Calculator</h1>
+    
+    <div class="input-group">
+      <label for="birthdate">Select Date & Time of Birth:</label>
+      <input type="datetime-local" id="birthdate" />
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value" id="years">0</div>
+        <div class="metric-label">Years</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="months">0</div>
+        <div class="metric-label">Months</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="days">0</div>
+        <div class="metric-label">Days</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="hours">0</div>
+        <div class="metric-label">Hours</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="minutes">0</div>
+        <div class="metric-label">Minutes</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="seconds">0</div>
+        <div class="metric-label">Seconds</div>
+      </div>
+    </div>
+
+    <div class="totals-container">
+      <div class="totals-title">Lifetime Summary</div>
+      <div class="total-row">
+        <span>Total Days Lived:</span>
+        <span class="total-value" id="total-days">0</span>
+      </div>
+      <div class="total-row">
+        <span>Total Hours Lived:</span>
+        <span class="total-value" id="total-hours">0</span>
+      </div>
+      <div class="total-row">
+        <span>Total Minutes Lived:</span>
+        <span class="total-value" id="total-minutes">0</span>
+      </div>
+      <div class="total-row">
+        <span>Total Seconds Lived:</span>
+        <span class="total-value" id="total-seconds">0</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const birthdateInput = document.getElementById('birthdate');
+    let timerId = null;
+
+    // Set default value to Jan 1, 2000 at 12:00
+    const defaultBirthdate = new Date();
+    defaultBirthdate.setFullYear(2000, 0, 1);
+    defaultBirthdate.setHours(12, 0, 0, 0);
+
+    // Format for datetime-local input
+    const pad = (num) => String(num).padStart(2, '0');
+    const formattedDefault = `${defaultBirthdate.getFullYear()}-${pad(defaultBirthdate.getMonth() + 1)}-${pad(defaultBirthdate.getDate())}T${pad(defaultBirthdate.getHours())}:${pad(defaultBirthdate.getMinutes())}`;
+    
+    birthdateInput.value = formattedDefault;
+
+    function updateAge() {
+      const birthDate = new Date(birthdateInput.value);
+      const now = new Date();
+
+      if (isNaN(birthDate.getTime()) || birthDate > now) {
+        return;
+      }
+
+      // Calculate broken-down age
+      let years = now.getFullYear() - birthDate.getFullYear();
+      let months = now.getMonth() - birthDate.getMonth();
+      let days = now.getDate() - birthDate.getDate();
+      let hours = now.getHours() - birthDate.getHours();
+      let minutes = now.getMinutes() - birthDate.getMinutes();
+      let seconds = now.getSeconds() - birthDate.getSeconds();
+
+      if (seconds < 0) { seconds += 60; minutes--; }
+      if (minutes < 0) { minutes += 60; hours--; }
+      if (hours < 0) { hours += 24; days--; }
+
+      if (days < 0) {
+        // Get total days in the previous month
+        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += prevMonth.getDate();
+        months--;
+      }
+
+      if (months < 0) {
+        months += 12;
+        years--;
+      }
+
+      // Calculate totals
+      const diffMs = now - birthDate;
+      const totalSecs = Math.floor(diffMs / 1000);
+      const totalMins = Math.floor(totalSecs / 60);
+      const totalHrs = Math.floor(totalMins / 60);
+      const totalDys = Math.floor(totalHrs / 24);
+
+      // Render values
+      document.getElementById('years').textContent = years;
+      document.getElementById('months').textContent = months;
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('minutes').textContent = minutes;
+      document.getElementById('seconds').textContent = seconds;
+
+      document.getElementById('total-days').textContent = totalDys.toLocaleString();
+      document.getElementById('total-hours').textContent = totalHrs.toLocaleString();
+      document.getElementById('total-minutes').textContent = totalMins.toLocaleString();
+      document.getElementById('total-seconds').textContent = totalSecs.toLocaleString();
+    }
+
+    // Update immediately and start interval
+    updateAge();
+    timerId = setInterval(updateAge, 1000);
+
+    birthdateInput.addEventListener('change', updateAge);
+  </script>
+</body>
+</html>
