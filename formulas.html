@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Formula Explorer</title>
+    <style>
+        /* CSS STYLES */
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --highlight: #eff6ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .header-title p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            flex-grow: 1;
+        }
+
+        /* Sidebar Topic Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            height: fit-content;
+        }
+
+        .sidebar h2 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topic-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .topic-btn {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .topic-btn:hover {
+            background-color: var(--bg-color);
+        }
+
+        .topic-btn.active {
+            background-color: var(--highlight);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Main Content View */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .topic-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .topic-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .topic-header p {
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .formula-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .formula-card h3 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .formula-display {
+            background: var(--highlight);
+            color: var(--primary);
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            border: 1px dashed var(--primary);
+        }
+
+        .variables-list {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .variables-list ul {
+            margin-left: 1.2rem;
+            margin-top: 0.25rem;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>Formula Explorer</h1>
+            <p>Select a subject and topic to view related equations</p>
+        </div>
+        <div class="controls">
+            <select id="subjectSelect">
+                <!-- Populated via JavaScript -->
+            </select>
+            <input type="text" id="searchInput" placeholder="Search formulas or topics...">
+        </div>
+    </header>
+
+    <main>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h2>Topics</h2>
+            <ul class="topic-list" id="topicList">
+                <!-- Populated via JavaScript -->
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section class="content-area">
+            <div class="topic-header" id="topicHeader">
+                <h2 id="topicTitle">Select a Topic</h2>
+                <p id="topicDescription">Choose a subject from the top menu and a topic from the left sidebar to inspect formulas.</p>
+            </div>
+
+            <div class="formula-grid" id="formulaGrid">
+                <!-- Formula Cards Populated via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // JAVASCRIPT LOGIC & DATA
+        
+        // Data Structure for Subjects, Topics, and Formulas
+        const subjectData = {
+            physics: {
+                name: "Physics",
+                topics: [
+                    {
+                        id: "kinematics",
+                        name: "Kinematics",
+                        description: "The study of motion without considering the forces that cause it.",
+                        formulas: [
+                            {
+                                name: "Velocity Formula",
+                                math: "v = v₀ + a · t",
+                                variables: ["v = Final Velocity", "v₀ = Initial Velocity", "a = Acceleration", "t = Time"]
+                            },
+                            {
+                                name: "Displacement Equation",
+                                math: "d = v₀ · t + ½ · a · t²",
+                                variables: ["d = Displacement", "v₀ = Initial Velocity", "t = Time", "a = Acceleration"]
+                            }
+                        ]
+                    },
+                    {
+                        id: "dynamics",
+                        name: "Newtonian Dynamics",
+                        description: "The relationship between forces acting on a body and its motion.",
+                        formulas: [
+                            {
+                                name: "Newton's Second Law",
+                                math: "F = m · a",
+                                variables: ["F = Net Force", "m = Mass", "a = Acceleration"]
+                            },
+                            {
+                                name: "Gravitational Force",
+                                math: "F = G · (m₁ · m₂) / r²",
+                                variables: ["F = Force", "G = Gravitational Constant", "m = Masses", "r = Distance"]
+                            }
+                        ]
+                    }
+                ]
+            },
+            math: {
+                name: "Mathematics",
+                topics: [
+                    {
+                        id: "algebra",
+                        name: "Algebra",
+                        description: "Core algebraic relationships, identities, and root calculations.",
+                        formulas: [
+                            {
+                                name: "Quadratic Formula",
+                                math: "x = (-b ± √(b² - 4ac)) / (2a)",
+                                variables: ["x = Unknowns / Roots", "a, b, c = Coefficients"]
+                            },
+                            {
+                                name: "Difference of Squares",
+                                math: "a² - b² = (a - b)(a + b)",
+                                variables: ["a, b = Variables / Terms"]
+                            }
+                        ]
+                    },
+                    {
+                        id: "calculus",
+                        name: "Calculus",
+                        description: "Mathematics dealing with rates of change and accumulation of quantities.",
+                        formulas: [
+                            {
+                                name: "Power Rule (Derivative)",
+                                math: "d/dx (xⁿ) = n · xⁿ⁻¹",
+                                variables: ["x = Variable", "n = Exponent Constant"]
+                            },
+                            {
+                                name: "Fundamental Theorem of Calculus",
+                                math: "∫[a to b] f(x) dx = F(b) - F(a)",
+                                variables: ["f(x) = Function", "F(x) = Antiderivative", "a, b = Bounds"]
+                            }
+                        ]
+                    }
+                ]
+            },
+            chemistry: {
+                name: "Chemistry",
+                topics: [
+                    {
+                        id: "thermodynamics",
+                        name: "Chemical Equilibrium & Gas Laws",
+                        description: "Equations dictating the physical behavior of gases and chemical solutions.",
+                        formulas: [
+                            {
+                                name: "Ideal Gas Law",
+                                math: "P · V = n · R · T",
+                                variables: ["P = Pressure", "V = Volume", "n = Moles", "R = Gas Constant", "T = Temperature"]
+                            },
+                            {
+                                name: "pH Calculation",
+                                math: "pH = -log₁₀[H⁺]",
+                                variables: ["pH = Acidity measure", "[H⁺] = Hydrogen ion concentration"]
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // State Management
+        let currentSubjectKey = "physics";
+        let activeTopicId = null;
+
+        // DOM Element Selectors
+        const subjectSelect = document.getElementById("subjectSelect");
+        const topicList = document.getElementById("topicList");
+        const topicTitle = document.getElementById("topicTitle");
+        const topicDescription = document.getElementById("topicDescription");
+        const formulaGrid = document.getElementById("formulaGrid");
+        const searchInput = document.getElementById("searchInput");
+
+        // Initialization
+        function init() {
+            populateSubjectDropdown();
+            loadSubject(currentSubjectKey);
+
+            // Event Listeners
+            subjectSelect.addEventListener("change", (e) => {
+                currentSubjectKey = e.target.value;
+                loadSubject(currentSubjectKey);
+            });
+
+            searchInput.addEventListener("input", handleSearch);
+        }
+
+        // Populate Subject Dropdown
+        function populateSubjectDropdown() {
+            subjectSelect.innerHTML = "";
+            Object.keys(subjectData).forEach(key => {
+                const option = document.createElement("option");
+                option.value = key;
+                option.textContent = subjectData[key].name;
+                subjectSelect.appendChild(option);
+            });
+        }
+
+        // Load Subject Data
+        function loadSubject(subjectKey) {
+            const subject = subjectData[subjectKey];
+            topicList.innerHTML = "";
+
+            if (subject.topics.length > 0) {
+                subject.topics.forEach((topic, index) => {
+                    const li = document.createElement("li");
+                    const button = document.createElement("button");
+                    button.className = `topic-btn ${index === 0 ? 'active' : ''}`;
+                    button.textContent = topic.name;
+                    button.onclick = () => selectTopic(topic.id);
+                    li.appendChild(button);
+                    topicList.appendChild(li);
+                });
+
+                // Select first topic by default
+                selectTopic(subject.topics[0].id);
+            } else {
+                renderEmptyState("No topics found for this subject.");
+            }
+        }
+
+        // Select & Display Specific Topic
+        function selectTopic(topicId) {
+            activeTopicId = topicId;
+            const subject = subjectData[currentSubjectKey];
+            const topic = subject.topics.find(t => t.id === topicId);
+
+            if (!topic) return;
+
+            // Update Sidebar UI active states
+            const buttons = topicList.querySelectorAll(".topic-btn");
+            buttons.forEach((btn, idx) => {
+                if (subject.topics[idx].id === topicId) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            });
+
+            // Update Topic Header
+            topicTitle.textContent = topic.name;
+            topicDescription.textContent = topic.description;
+
+            // Display Formulas
+            renderFormulas(topic.formulas);
+        }
+
+        // Render Formula Cards
+        function renderFormulas(formulas) {
+            formulaGrid.innerHTML = "";
+
+            if (formulas.length === 0) {
+                renderEmptyState("No matching formulas found.");
+                return;
+            }
+
+            formulas.forEach(formula => {
+                const card = document.createElement("div");
+                card.className = "formula-card";
+
+                const varListHtml = formula.variables
+                    ? formula.variables.map(v => `<li>${v}</li>`).join("")
+                    : "";
+
+                card.innerHTML = `
+                    <h3>${formula.name}</h3>
+                    <div class="formula-display">${formula.math}</div>
+                    ${varListHtml ? `
+                        <div class="variables-list">
+                            <strong>Variables:</strong>
+                            <ul>${varListHtml}</ul>
+                        </div>
+                    ` : ''}
+                `;
+                formulaGrid.appendChild(card);
+            });
+        }
+
+        // Search Filter Handler
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const subject = subjectData[currentSubjectKey];
+
+            if (!query) {
+                if (activeTopicId) selectTopic(activeTopicId);
+                return;
+            }
+
+            // Collect all matching formulas across all topics in the current subject
+            let matchedFormulas = [];
+            subject.topics.forEach(topic => {
+                topic.formulas.forEach(formula => {
+                    const matchesName = formula.name.toLowerCase().includes(query);
+                    const matchesMath = formula.math.toLowerCase().includes(query);
+                    const matchesTopic = topic.name.toLowerCase().includes(query);
+
+                    if (matchesName || matchesMath || matchesTopic) {
+                        matchedFormulas.push({
+                            ...formula,
+                            name: `${formula.name} (${topic.name})`
+                        });
+                    }
+                });
+            });
+
+            topicTitle.textContent = `Search Results for "${query}"`;
+            topicDescription.textContent = `Showing formulas matching your search query in ${subject.name}.`;
+            renderFormulas(matchedFormulas);
+        }
+
+        function renderEmptyState(message) {
+            formulaGrid.innerHTML = `<div class="empty-state"><p>${message}</p></div>`;
+        }
+
+        // Run application
+        init();
+    </script>
+</body>
+</html>
