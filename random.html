@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Image Generator</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Main Container */
+    .app-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    select, input[type="number"] {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input[type="number"]:focus {
+      border-color: #38bdf8;
+    }
+
+    .dimension-inputs {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dimension-inputs input {
+      width: 80px;
+      text-align: center;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #334155;
+      border: 1px solid #475569;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #475569;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+    }
+
+    /* Image Display Area */
+    .image-container {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    .image-container img.loaded {
+      opacity: 1;
+    }
+
+    /* Spinner & Message Overlay */
+    .spinner {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-left-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .status-message {
+      position: absolute;
+      color: #f87171;
+      font-size: 0.95rem;
+      padding: 0 20px;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+    <h1>Random Image Generator</h1>
+
+    <div class="controls">
+      <select id="categorySelect" aria-label="Select Category">
+        <option value="nature">Nature</option>
+        <option value="architecture">Architecture</option>
+        <option value="animals">Animals</option>
+        <option value="technology">Technology</option>
+        <option value="space">Space</option>
+        <option value="abstract">Abstract</option>
+      </select>
+
+      <div class="dimension-inputs">
+        <input type="number" id="widthInput" value="800" min="200" max="2000" placeholder="Width" aria-label="Image Width">
+        <span>×</span>
+        <input type="number" id="heightInput" value="600" min="200" max="2000" placeholder="Height" aria-label="Image Height">
+      </div>
+
+      <button class="btn" id="generateBtn">Generate</button>
+      <button class="btn btn-secondary" id="downloadBtn">Download</button>
+    </div>
+
+    <div class="image-container">
+      <div class="spinner" id="spinner"></div>
+      <div class="status-message" id="statusMessage"></div>
+      <img id="randomImage" alt="Randomly generated visual" />
+    </div>
+  </div>
+
+  <script>
+    // --- Application State ---
+    const state = {
+      isDownloading: false,
+      currentUrl: ''
+    };
+
+    // --- DOM Elements Cache ---
+    const elements = {
+      image: document.getElementById('randomImage'),
+      spinner: document.getElementById('spinner'),
+      statusMessage: document.getElementById('statusMessage'),
+      generateBtn: document.getElementById('generateBtn'),
+      downloadBtn: document.getElementById('downloadBtn'),
+      categorySelect: document.getElementById('categorySelect'),
+      widthInput: document.getElementById('widthInput'),
+      heightInput: document.getElementById('heightInput')
+    };
+
+    // --- Core Helper Functions ---
+
+    /**
+     * Builds a uniquely parameterized image URL from picsum.photos.
+     */
+    function buildImageUrl(category, width, height) {
+      const sanitizedWidth = Math.min(Math.max(parseInt(width) || 800, 200), 2000);
+      const sanitizedHeight = Math.min(Math.max(parseInt(height) || 600, 200), 2000);
+      const randomSeed = Math.floor(Math.random() * 1000);
+      
+      return `https://picsum.photos/seed/${category}-${randomSeed}/${sanitizedWidth}/${sanitizedHeight}`;
+    }
+
+    /**
+     * UI State Controller: Toggles loading indicators and button states.
+     */
+    function setLoadingState(isLoading) {
+      if (isLoading) {
+        elements.spinner.style.display = 'block';
+        elements.statusMessage.style.display = 'none';
+        elements.image.classList.remove('loaded');
+        elements.generateBtn.disabled = true;
+      } else {
+        elements.spinner.style.display = 'none';
+        elements.generateBtn.disabled = false;
+      }
+    }
+
+    /**
+     * Error Handler: Displays UI error feedback.
+     */
+    function showError(message) {
+      elements.spinner.style.display = 'none';
+      elements.statusMessage.textContent = message;
+      elements.statusMessage.style.display = 'block';
+      elements.generateBtn.disabled = false;
+    }
+
+    // --- Action Handlers ---
+
+    /**
+     * Fetches and renders a new random image based on form settings.
+     */
+    function loadNewImage() {
+      setLoadingState(true);
+
+      const category = elements.categorySelect.value;
+      const width = elements.widthInput.value;
+      const height = elements.heightInput.value;
+
+      state.currentUrl = buildImageUrl(category, width, height);
+      elements.image.src = state.currentUrl;
+    }
+
+    /**
+     * Blob-based file downloader for image files.
+     */
+    async function downloadCurrentImage() {
+      if (!state.currentUrl || state.isDownloading) return;
+
+      try {
+        state.isDownloading = true;
+        elements.downloadBtn.disabled = true;
+        elements.downloadBtn.textContent = 'Saving...';
+
+        const response = await fetch(elements.image.src);
+        if (!response.ok) throw new Error('Network response failed');
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        const anchor = document.createElement('a');
+        anchor.href = blobUrl;
+        anchor.download = `${elements.categorySelect.value}-image.jpg`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        
+        // Cleanup memory
+        anchor.remove();
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        alert('Direct download failed. Right-click the image and select "Save image as..."');
+      } finally {
+        state.isDownloading = false;
+        elements.downloadBtn.disabled = false;
+        elements.downloadBtn.textContent = 'Download';
+      }
+    }
+
+    // --- Event Listeners Setup ---
+
+    function initializeEventListeners() {
+      // Image load completion
+      elements.image.addEventListener('load', () => {
+        setLoadingState(false);
+        elements.image.classList.add('loaded');
+      });
+
+      // Image load failure
+      elements.image.addEventListener('error', () => {
+        showError('Failed to load image. Please try again.');
+      });
+
+      // Action triggers
+      elements.generateBtn.addEventListener('click', loadNewImage);
+      elements.downloadBtn.addEventListener('click', downloadCurrentImage);
+      elements.categorySelect.addEventListener('change', loadNewImage);
+
+      // Refresh on "Enter" key press inside dimension fields
+      [elements.widthInput, elements.heightInput].forEach(input => {
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') loadNewImage();
+        });
+      });
+    }
+
+    // --- Initialization ---
+
+    function initApp() {
+      initializeEventListeners();
+      loadNewImage(); // Load initial image on startup
+    }
+
+    // Launch application
+    initApp();
+  </script>
+</body>
+</html>
