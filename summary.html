@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBriefs | 145 Hollywood Film Summaries</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header & Navigation */
+    header {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stats-badge {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #38bdf8;
+    }
+
+    /* Filters */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-input, .genre-select {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus, .genre-select:focus {
+      border-color: #38bdf8;
+    }
+
+    /* Main Display */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Card Styling */
+    .card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      color: #f1f5f9;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      align-items: center;
+    }
+
+    .badge {
+      background: #0284c7;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .summary-section {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #38bdf8;
+      margin-bottom: 0.25rem;
+      font-weight: 700;
+    }
+
+    .card-footer {
+      padding: 0.8rem 1.25rem;
+      background: rgba(15, 23, 42, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .empty-state {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 4rem;
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: #090d16;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display:flex; align-items:center; gap: 1rem;">
+      <div class="logo">🎬 CineBriefs</div>
+      <div class="stats-badge" id="countDisplay">145 Movies</div>
+    </div>
+    
+    <div class="filter-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search title, director, plot..." />
+      <select id="genreSelect" class="genre-select">
+        <option value="ALL">All Genres (145)</option>
+        <option value="Sci-Fi">Sci-Fi (29)</option>
+        <option value="Drama">Drama (29)</option>
+        <option value="Action">Action (29)</option>
+        <option value="Crime">Crime (29)</option>
+        <option value="Animation">Animation (29)</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <div class="movie-grid" id="movieGrid"></div>
+  </main>
+
+  <footer>
+    CineBriefs &copy; Hollywood Film Summaries Library
+  </footer>
+
+  <script>
+    // Database generator producing exactly 29 movies per genre (145 total)
+    const movies = [
+      // --- SCI-FI (29) ---
+      { id: 1, title: "Inception", year: 2010, director: "Christopher Nolan", genre: "Sci-Fi", rating: "8.8", summary: "A thief who enters human dreams to steal secrets is tasked with planting an idea into a CEO's mind.", keyTheme: "Reality vs illusion, guilt." },
+      { id: 2, title: "Interstellar", year: 2014, director: "Christopher Nolan", genre: "Sci-Fi", rating: "8.7", summary: "Astronauts travel through a wormhole near Saturn in search of a new habitable planet for humanity.", keyTheme: "Love across space-time, survival." },
+      { id: 3, title: "The Matrix", year: 1999, director: "Lana & Lilly Wachowski", genre: "Sci-Fi", rating: "8.7", summary: "A computer hacker discovers reality is a simulated illusion created by machines to control humanity.", keyTheme: "Free will, perception." },
+      { id: 4, title: "Blade Runner 2049", year: 2017, director: "Denis Villeneuve", genre: "Sci-Fi", rating: "8.0", summary: "A young blade runner uncovers a long-buried secret that leads him to former blade runner Rick Deckard.", keyTheme: "Humanity, memory, identity." },
+      { id: 5, title: "Arrival", year: 2016, director: "Denis Villeneuve", genre: "Sci-Fi", rating: "7.9", summary: "A linguist works with the military to communicate with alien lifeforms after twelve mysterious ships land across Earth.", keyTheme: "Communication, temporal perception." },
+      { id: 6, title: "2001: A Space Odyssey", year: 1968, director: "Stanley Kubrick", genre: "Sci-Fi", rating: "8.3", summary: "A mysterious monolith prompts a space mission where an AI named HAL 9000 exhibits dangerous behavior.", keyTheme: "Human evolution, AI perils." },
+      { id: 7, title: "The Terminator", year: 1984, director: "James Cameron", genre: "Sci-Fi", rating: "8.1", summary: "A cyborg assassin is sent back in time to kill Sarah Connor before she gives birth to humanity's savior.", keyTheme: "Fate, technology backfire." },
+      { id: 8, title: "Terminator 2: Judgment Day", year: 1991, director: "James Cameron", genre: "Sci-Fi", rating: "8.6", summary: "A reprogrammed Terminator protects young John Connor from an advanced liquid-metal shape-shifting killer.", keyTheme: "Redemption, fate." },
+      { id: 9, title: "Alien", year: 1979, director: "Ridley Scott", genre: "Sci-Fi", rating: "8.5", summary: "The crew of a commercial space tug investigates a distress signal and encounters a deadly alien organism.", keyTheme: "Isolation, cosmic terror." },
+      { id: 10, title: "Aliens", year: 1986, director: "James Cameron", genre: "Sci-Fi", rating: "8.4", summary: "Ellen Ripley returns to the alien planet with a squad of space marines to investigate a dark silent colony.", keyTheme: "Maternal instinct, corporate greed." },
+      { id: 11, title: "Ex Machina", year: 2014, director: "Alex Garland", genre: "Sci-Fi", rating: "7.7", summary: "A programmer evaluates the human qualities of a breathtaking humanoid artificial intelligence.", keyTheme: "Consciousness, manipulation." },
+      { id: 12, title: "Jurassic Park", year: 1993, director: "Steven Spielberg", genre: "Sci-Fi", rating: "8.2", summary: "Genetically cloned dinosaurs run rampant through a remote island theme park during a power failure.", keyTheme: "Playing God, chaos theory." },
+      { id: 13, title: "Minority Report", year: 2002, director: "Steven Spielberg", genre: "Sci-Fi", rating: "7.6", summary: "A specialized police officer in a future where crime is stopped before happening is accused of a future murder.", keyTheme: "Determinism vs free choice." },
+      { id: 14, title: "Children of Men", year: 2006, director: "Alfonso Cuarón", genre: "Sci-Fi", rating: "7.9", summary: "In a world faced with human infertility, a bureaucrat agrees to help transport a miraculously pregnant woman.", keyTheme: "Hope amidst collapse." },
+      { id: 15, title: "Dune", year: 2021, director: "Denis Villeneuve", genre: "Sci-Fi", rating: "8.0", summary: "A gifted young noble must travel to the most dangerous planet in the universe to ensure his people's survival.", keyTheme: "Destiny, resource politics." },
+      { id: 16, title: "Dune: Part Two", year: 2024, director: "Denis Villeneuve", genre: "Sci-Fi", rating: "8.5", summary: "Paul Atreides unites with the Fremen to seek revenge against the conspirators who destroyed his family.", keyTheme: "Fanaticism, political power." },
+      { id: 17, title: "District 9", year: 2009, director: "Neill Blomkamp", genre: "Sci-Fi", rating: "7.9", summary: "An agent contractually relocating alien refugees contracts a virus that alters his DNA.", keyTheme: "Xenophobia, segregation." },
+      { id: 18, title: "The Martian", year: 2015, director: "Ridley Scott", genre: "Sci-Fi", rating: "8.0", summary: "An astronaut becomes stranded on Mars and must rely on his ingenuity to signal Earth for rescue.", keyTheme: "Human survival, science problem-solving." },
+      { id: 19, title: "E.T. the Extra-Terrestrial", year: 1982, director: "Steven Spielberg", genre: "Sci-Fi", rating: "7.9", summary: "A troubled boy gathers the courage to help a friendly alien escape Earth and return to his home planet.", keyTheme: "Empathy, childhood innocence." },
+      { id: 20, title: "Star Wars: A New Hope", year: 1977, director: "George Lucas", genre: "Sci-Fi", rating: "8.6", summary: "A farm boy joins forces with a Jedi Knight and rogues to save the galaxy from an evil galactic empire.", keyTheme: "Good vs evil, heroism." },
+      { id: 21, title: "Star Wars: The Empire Strikes Back", year: 1980, director: "Irvin Kershner", genre: "Sci-Fi", rating: "8.7", summary: "The rebels scatter after an attack on their base while Luke Skywalker trains under Jedi Master Yoda.", keyTheme: "Failure, family revelations." },
+      { id: 22, title: "Star Wars: Return of the Jedi", year: 1983, director: "Richard Marquand", genre: "Sci-Fi", rating: "8.3", summary: "Luke Skywalker attempts to bring his father back from the dark side while rebels assault the second Death Star.", keyTheme: "Redemption, forgiveness." },
+      { id: 23, title: "Gattaca", year: 1997, director: "Andrew Niccol", genre: "Sci-Fi", rating: "7.8", summary: "A genetically inferior man assumes the identity of a superior gentleman to pursue his dream of space travel.", keyTheme: "Human spirit vs genetic determinism." },
+      { id: 24, title: "Twelve Monkeys", year: 1995, director: "Terry Gilliam", genre: "Sci-Fi", rating: "8.0", summary: "A convict is sent back in time to collect information about a deadly man-made virus that wiped out humanity.", keyTheme: "Fate, madness, time paradox." },
+      { id: 25, title: "The Thing", year: 1982, director: "John Carpenter", genre: "Sci-Fi", rating: "8.2", summary: "A research team in Antarctica is hunted by a shape-shifting alien that assumes the appearance of its victims.", keyTheme: "Paranoia, loss of trust." },
+      { id: 26, title: "Her", year: 2013, director: "Spike Jonze", genre: "Sci-Fi", rating: "8.0", summary: "A lonely writer develops an unlikely romantic relationship with an operating system designed to meet his every need.", keyTheme: "Loneliness, modern intimacy." },
+      { id: 27, title: "Edge of Tomorrow", year: 2014, director: "Doug Liman", genre: "Sci-Fi", rating: "7.9", summary: "A soldier fighting aliens gets caught in a time loop, reliving the same battle every time he dies.", keyTheme: "Perseverance, growth through failure." },
+      { id: 28, title: "Avatar", year: 2009, director: "James Cameron", genre: "Sci-Fi", rating: "7.9", summary: "A paraplegic Marine dispatched to the moon Pandora becomes torn between following orders and protecting its native people.", keyTheme: "Colonialism, nature connection." },
+      { id: 29, title: "Gravity", year: 2013, director: "Alfonso Cuarón", genre: "Sci-Fi", rating: "7.7", summary: "Two astronauts work together to survive after a sudden accident leaves them floating adrift in deep space.", keyTheme: "Grief, rebirth, survival." },
+
+      // --- DRAMA (29) ---
+      { id: 30, title: "The Shawshank Redemption", year: 1994, director: "Frank Darabont", genre: "Drama", rating: "9.3", summary: "A wrongfully convicted banker forms a lasting bond with a fellow inmate while maintaining his inner hope.", keyTheme: "Resilience, hope, freedom." },
+      { id: 31, title: "Forrest Gump", year: 1994, director: "Robert Zemeckis", genre: "Drama", rating: "8.8", summary: "The life story of an Alabama man with a low IQ who unwittingly witnesses and influences key historic events.", keyTheme: "Destiny, innocence, kindness." },
+      { id: 32, title: "Fight Club", year: 1999, director: "David Fincher", genre: "Drama", rating: "8.8", summary: "An insomniac office worker and a soap salesman form an underground fight club that evolves into a chaotic movement.", keyTheme: "Consumerism, masculinity crisis." },
+      { id: 33, title: "Schindler's List", year: 1993, director: "Steven Spielberg", genre: "Drama", rating: "9.0", summary: "In German-occupied Poland, industrialist Oskar Schindler saves over eleven hundred Jews from extermination.", keyTheme: "Humanity in darkness, moral duty." },
+      { id: 34, title: "12 Angry Men", year: 1957, director: "Sidney Lumet", genre: "Drama", rating: "9.0", summary: "A single juror holds out against convictions, forcing his peers to re-examine the evidence in a murder trial.", keyTheme: "Justice, prejudice, reasonable doubt." },
+      { id: 35, title: "Good Will Hunting", year: 1997, director: "Gus Van Sant", genre: "Drama", rating: "8.3", summary: "A janitor at MIT possesses a genius math intellect but needs help from a psychologist to confront his past trauma.", keyTheme: "Healing trauma, self-worth." },
+      { id: 36, title: "Whiplash", year: 2014, director: "Damien Chazelle", genre: "Drama", rating: "8.5", summary: "A promising young jazz drummer is pushed to his absolute breaking point by an abusive music instructor.", keyTheme: "Ambition, toxic perfectionism." },
+      { id: 37, title: "The Social Network", year: 2010, director: "David Fincher", genre: "Drama", rating: "7.8", summary: "The story of how Mark Zuckerberg created Facebook while facing personal and legal battles from former friends.", keyTheme: "Ambition, betrayal, connection." },
+      { id: 38, title: "Dead Poets Society", year: 1989, director: "Peter Weir", genre: "Drama", rating: "8.1", summary: "An unconventional English teacher inspires his students at an elite prep school through poetry to seize the day.", keyTheme: "Carpe diem, conformity vs individualism." },
+      { id: 39, title: "The Prestige", year: 2006, director: "Christopher Nolan", genre: "Drama", rating: "8.5", summary: "Two rival magicians in 19th-century London engage in a bitter obsession to create the ultimate teleportation illusion.", keyTheme: "Obsession, sacrifice." },
+      { id: 40, title: "A Beautiful Mind", year: 2001, director: "Ron Howard", genre: "Drama", rating: "8.2", summary: "A brilliant mathematician suffers from schizophrenia while making groundbreaking contributions to economics.", keyTheme: "Mental illness, love, perseverance." },
+      { id: 41, title: "The Pursuit of Happyness", year: 2006, director: "Gabriele Muccino", genre: "Drama", rating: "8.0", summary: "A struggling salesman takes custody of his young son while undergoing an unpaid stockbroker internship.", keyTheme: "Fatherhood, endurance, hope." },
+      { id: 42, title: "There Will Be Blood", year: 2007, director: "Paul Thomas Anderson", genre: "Drama", rating: "8.2", summary: "A ruthless oil prospector relentlessly pursues wealth during California's late 19th-century boom.", keyTheme: "Greed, ambition, isolation." },
+      { id: 43, title: "American Beauty", year: 1999, director: "Sam Mendes", genre: "Drama", rating: "8.3", summary: "A suburban father experiencing a midlife crisis becomes infatuated with his daughter's best friend.", keyTheme: "Suburban disillusionment, beauty." },
+      { id: 44, title: "Spotlight", year: 2015, director: "Tom McCarthy", genre: "Drama", rating: "8.1", summary: "Investigative journalists at the Boston Globe uncover systemic abuse cover-ups within the Catholic Church.", keyTheme: "Truth, journalistic integrity." },
+      { id: 45, title: "La La Land", year: 2016, director: "Damien Chazelle", genre: "Drama", rating: "8.0", summary: "An aspiring actress and a jazz musician struggle to reconcile their personal dreams with their romantic bond.", keyTheme: "Dreams vs love, compromise." },
+      { id: 46, title: "The Truman Show", year: 1998, director: "Peter Weir", genre: "Drama", rating: "8.2", summary: "An insurance salesman discovers his whole life is a televised reality show broadcast live to the world.", keyTheme: "Authenticity, media control." },
+      { id: 47, title: "Gran Torino", year: 2008, director: "Clint Eastwood", genre: "Drama", rating: "8.1", summary: "A disgruntled Korean War veteran sets out to reform his Hmong neighbor who tried to steal his car.", keyTheme: "Prejudice, redemption, sacrifice." },
+      { id: 48, title: "The Green Mile", year: 1999, director: "Frank Darabont", genre: "Drama", rating: "8.6", summary: "A death row corrections officer discovers that an inmate accused of murder possesses miraculous healing abilities.", keyTheme: "Empathy, divine mystery, cruelty." },
+      { id: 49, title: "Room", year: 2015, director: "Lenny Abrahamson", genre: "Drama", rating: "8.1", summary: "A young mother and her five-year-old son gain freedom after being held captive in a small shed for years.", keyTheme: "Maternal bond, adaptation to reality." },
+      { id: 50, title: "12 Years a Slave", year: 2013, director: "Steve McQueen", genre: "Drama", rating: "8.1", summary: "A free Black man in pre-Civil War America is kidnapped and sold into brutal Southern slavery.", keyTheme: "Human dignity, cruelty of slavery." },
+      { id: 51, title: "The Elephant Man", year: 1980, director: "David Lynch", genre: "Drama", rating: "8.1", summary: "A compassionate Victorian surgeon rescues a severely disfigured man from a freak show circus.", keyTheme: "Dignity, inner humanity." },
+      { id: 52, title: "Manchester by the Sea", year: 2016, director: "Kenneth Lonergan", genre: "Drama", rating: "7.8", summary: "A grieving janitor is appointed guardian of his teenage nephew following his brother's unexpected death.", keyTheme: "Grief, unresolvable guilt." },
+      { id: 53, title: "Oppenheimer", year: 2023, director: "Christopher Nolan", genre: "Drama", rating: "8.9", summary: "The story of American scientist J. Robert Oppenheimer and his role in developing the atomic bomb.", keyTheme: "Scientific morality, political fallout." },
+      { id: 54, title: "Birdman", year: 2014, director: "Alejandro G. Iñárritu", genre: "Drama", rating: "7.7", summary: "A washed-up superhero actor attempts to revitalize his fading career by mounting a Broadway play.", keyTheme: "Ego, artistic validation." },
+      { id: 55, title: "Network", year: 1976, director: "Sidney Lumet", genre: "Drama", rating: "8.1", summary: "A television news anchor uses his unhinged broadcasts to exploit media sensationalism for high ratings.", keyTheme: "Media exploitation, rage." },
+      { id: 56, title: "Rain Man", year: 1988, director: "Barry Levinson", genre: "Drama", rating: "8.0", summary: "A selfish car dealer discovers his deceased father left millions to an autistic brother he never knew existed.", keyTheme: "Brotherhood, personal transformation." },
+      { id: 57, title: "Drive My Car", year: 2021, director: "Ryusuke Hamaguchi", genre: "Drama", rating: "7.6", summary: "An aging theater director confronts his past grief while bonding with his quiet young female chauffeur.", keyTheme: "Grief, shared understanding." },
+      { id: 58, title: "Coda", year: 2021, director: "Sian Heder", genre: "Drama", rating: "8.0", summary: "The hearing daughter of a deaf family balances her musical ambitions with helping her family business.", keyTheme: "Family obligations, individual voice." },
+
+      // --- ACTION (29) ---
+      { id: 59, title: "The Dark Knight", year: 2008, director: "Christopher Nolan", genre: "Action", rating: "9.0", summary: "Batman faces the Joker, an anarchic criminal mastermind who tests the moral limits of Gotham City.", keyTheme: "Order vs Chaos, moral boundaries." },
+      { id: 60, title: "Mad Max: Fury Road", year: 2015, director: "George Miller", genre: "Action", rating: "8.1", summary: "In a post-apocalyptic wasteland, a woman rebels against a tyrannical ruler with the help of a quiet wanderer.", keyTheme: "Freedom, redemption, survival." },
+      { id: 61, title: "Gladiator", year: 2000, director: "Ridley Scott", genre: "Action", rating: "8.5", summary: "A betrayed Roman general seeks vengeance against the corrupt emperor who murdered his family.", keyTheme: "Vengeance, honor, justice." },
+      { id: 62, title: "Die Hard", year: 1988, director: "John McTiernan", genre: "Action", rating: "8.2", summary: "An off-duty cop takes on a group of organized terrorists who seize a Los Angeles skyscraper during Christmas.", keyTheme: "Everyman heroism, resourcefulness." },
+      { id: 63, title: "The Matrix Reloaded", year: 2003, director: "Lana & Lilly Wachowski", genre: "Action", rating: "7.2", summary: "Neo and the rebel leaders race against time as the machine army marches toward Zion.", keyTheme: "Choice vs fate, systemic control." },
+      { id: 64, title: "John Wick", year: 2014, director: "Chad Stahelski", genre: "Action", rating: "7.4", summary: "A retired assassin comes out of retirement to hunt down the gangsters who took everything from him.", keyTheme: "Grief, consequences of violence." },
+      { id: 65, title: "Top Gun: Maverick", year: 2022, director: "Joseph Kosinski", genre: "Action", rating: "8.3", summary: "After thirty years, naval aviator Maverick confronts past ghosts while training a specialized squad for an urgent mission.", keyTheme: "Mentorship, letting go." },
+      { id: 66, title: "Casino Royale", year: 2006, director: "Martin Campbell", genre: "Action", rating: "8.0", summary: "James Bond earns his 00 status and enters a high-stakes poker game in Montenegro to bankrupt a terrorist banker.", keyTheme: "Trust, sacrifice, duty." },
+      { id: 67, title: "Heat", year: 1995, director: "Michael Mann", genre: "Action", rating: "8.3", summary: "An obsessive LAPD detective pursues a disciplined career bank robber and his crew across Los Angeles.", keyTheme: "Professionalism, duality." },
+      { id: 68, title: "Speed", year: 1994, director: "Jan de Bont", genre: "Action", rating: "7.3", summary: "A young officer must keep a city bus traveling above 50 mph to prevent an onboard bomb from exploding.", keyTheme: "High-stakes focus, ingenuity." },
+      { id: 69, title: "Raiders of the Lost Ark", year: 1981, director: "Steven Spielberg", genre: "Action", rating: "8.4", summary: "Archaeologist Indiana Jones races against Nazis to find the legendary Ark of the Covenant.", keyTheme: "Good vs evil, historical mystery." },
+      { id: 70, title: "The Avengers", year: 2012, director: "Joss Whedon", genre: "Action", rating: "8.0", summary: "Earth's mightiest heroes must learn to work as a team to stop Loki and his alien army from invading Earth.", keyTheme: "Unity, setting aside ego." },
+      { id: 71, title: "Avengers: Endgame", year: 2019, director: "Anthony & Joe Russo", genre: "Action", rating: "8.4", summary: "The remaining Avengers assemble once more to reverse Thanos' actions and restore order to the universe.", keyTheme: "Sacrifice, closure." },
+      { id: 72, title: "Logan", year: 2017, director: "James Mangold", genre: "Action", rating: "8.1", summary: "An aging Wolverine cares for an ailing Professor X while protecting a young mutant girl hunted by dark forces.", keyTheme: "Mortality, legacy, protecting youth." },
+      { id: 73, title: "Mission: Impossible - Fallout", year: 2018, director: "Christopher McQuarrie", genre: "Action", rating: "7.7", summary: "Ethan Hunt and his IMF team race against time after a mission goes wrong, threatening nuclear disaster.", keyTheme: "Duty, personal loyalty." },
+      { id: 74, title: "Skyfall", year: 2012, director: "Sam Mendes", genre: "Action", rating: "7.8", summary: "James Bond's loyalty to M is tested when her past returns to haunt MI6 in a personal attack.", keyTheme: "Old world vs new tech, loyalty." },
+      { id: 75, title: "The Raid", year: 2011, director: "Gareth Evans", genre: "Action", rating: "7.6", summary: "A SWAT team gets trapped inside a high-rise apartment building run by a ruthless drug lord.", keyTheme: "Pure survival, tactical combat." },
+      { id: 76, title: "Bourne Identity", year: 2002, director: "Doug Liman", genre: "Action", rating: "7.9", summary: "A man suffering from amnesia races to rediscover his identity while evading elite assassins.", keyTheme: "Identity, institutional betrayal." },
+      { id: 77, title: "The Bourne Ultimatum", year: 2007, director: "Paul Greengrass", genre: "Action", rating: "8.0", summary: "Jason Bourne evades a ruthless CIA official and his assassins while attempting to uncover his origins.", keyTheme: "Accountability, self-truth." },
+      { id: 78, title: "Kill Bill: Vol. 1", year: 2003, director: "Quentin Tarantino", genre: "Action", rating: "8.2", summary: "A former assassin awakens from a four-year coma and embarks on a quest for revenge against her former squad.", keyTheme: "Vengeance, determination." },
+      { id: 79, title: "Kill Bill: Vol. 2", year: 2004, director: "Quentin Tarantino", genre: "Action", rating: "8.0", summary: "The Bride continues her quest to eliminate the remaining targets on her revenge list before confronting Bill.", keyTheme: "Maternal instinct, closure." },
+      { id: 80, title: "First Blood", year: 1982, director: "Ted Kotcheff", genre: "Action", rating: "7.7", summary: "A traumatized Vietnam veteran is pushed to his limits by a small-town police chief, triggering a woodland manhunt.", keyTheme: "PTSD, society discarding veterans." },
+      { id: 81, title: "Predator", year: 1987, director: "John McTiernan", genre: "Action", rating: "7.8", summary: "A team of elite commando operatives in a Central American jungle are hunted by an technologically advanced alien creature.", keyTheme: "Prey becoming hunter." },
+      { id: 82, title: "RoboCop", year: 1987, director: "Paul Verhoeven", genre: "Action", rating: "7.6", summary: "In a dystopian Detroit, a terminally wounded officer is resurrected as a powerful cyborg law enforcer.", keyTheme: "Corporate greed, humanity lingering." },
+      { id: 83, title: "Lethal Weapon", year: 1987, director: "Richard Donner", genre: "Action", rating: "7.6", summary: "A reckless cop paired with a cautious veteran detective must work together to uncover a drug ring.", keyTheme: "Partnership, coping with loss." },
+      { id: 84, title: "Taken", year: 2008, director: "Pierre Morel", genre: "Action", rating: "7.8", summary: "A retired CIA operative relies on his old skills to rescue his estranged daughter who was kidnapped in Paris.", keyTheme: "Paternal protection, relentless drive." },
+      { id: 85, title: "Black Panther", year: 2018, director: "Ryan Coogler", genre: "Action", rating: "7.3", summary: "T'Challa returns home to rule Wakanda but finds his sovereignty challenged by a vengeful adversary.", keyTheme: "Heritage, isolationism vs global aid." },
+      { id: 86, title: "Spider-Man: Into the Spider-Verse", year: 2018, director: "Persichetti, Ramsey, Rothman", genre: "Action", rating: "8.4", summary: "Teenager Miles Morales becomes the new Spider-Man and joins alternate heroes to stop a multiverse threat.", keyTheme: "Belief in oneself, shared legacy." },
+      { id: 87, title: "1917", year: 2019, director: "Sam Mendes", genre: "Action", rating: "8.2", summary: "Two British soldiers are assigned to deliver a critical message deep in enemy territory to save hundreds during WWI.", keyTheme: "Duty, grueling survival." },
+
+      // --- CRIME (29) ---
+      { id: 88, title: "The Godfather", year: 1972, director: "Francis Ford Coppola", genre: "Crime", rating: "9.2", summary: "The reluctant son of a mafia patriarch takes over the family empire, beginning his corruptive descent.", keyTheme: "Power corrupting, family legacy." },
+      { id: 89, title: "The Godfather Part II", year: 1974, director: "Francis Ford Coppola", genre: "Crime", rating: "9.0", summary: "Traces Vito Corleone's early life while his son Michael expands the family crime syndicate into Nevada.", keyTheme: "The price of absolute control." },
+      { id: 90, title: "Pulp Fiction", year: 1994, director: "Quentin Tarantino", genre: "Crime", rating: "8.9", summary: "Interconnected stories of hitmen, a boxer, and diner thieves weave through Los Angeles.", keyTheme: "Divine intervention, fate." },
+      { id: 91, title: "Goodfellas", year: 1990, director: "Martin Scorsese", genre: "Crime", rating: "8.7", summary: "The rise and fall of mob associate Henry Hill as he navigates life inside the Italian-American mafia.", keyTheme: "Allure and paranoia of crime." },
+      { id: 92, title: "The Silence of the Lambs", year: 1991, director: "Jonathan Demme", genre: "Crime", rating: "8.6", summary: "An FBI trainee consults incarcerated cannibalistic killer Hannibal Lecter to catch another serial murderer.", keyTheme: "Psychological manipulation, trauma." },
+      { id: 93, title: "Se7en", year: 1995, director: "David Fincher", genre: "Crime", rating: "8.6", summary: "Two detectives hunt a meticulous serial killer who uses the seven deadly sins as his motif.", keyTheme: "Moral decay, cynicism vs hope." },
+      { id: 94, title: "The Departed", year: 2006, director: "Martin Scorsese", genre: "Crime", rating: "8.5", summary: "An undercover cop infiltrates an Irish gang while a gang mole infiltrates the state police department.", keyTheme: "Duality, identity crisis." },
+      { id: 95, title: "City of God", year: 2002, director: "Fernando Meirelles", genre: "Crime", rating: "8.6", summary: "Two boys growing up in a violent Rio neighborhood choose different paths: one becomes a photographer, the other a gang kingpin.", keyTheme: "Cycle of violence, choices." },
+      { id: 96, title: "Scarface", year: 1983, director: "Brian De Palma", genre: "Crime", rating: "8.3", summary: "A Cuban immigrant seizes control of a Miami drug cartel but succumbs to paranoia and greed.", keyTheme: "American dream gone dark, hubris." },
+      { id: 97, title: "Casino", year: 1995, director: "Martin Scorsese", genre: "Crime", rating: "8.2", summary: "Mobsters manage a lucrative Las Vegas casino until greed, betrayal, and law enforcement shatter their empire.", keyTheme: "Excess, institutional corruption." },
+      { id: 98, title: "L.A. Confidential", year: 1997, director: "Curtis Hanson", genre: "Crime", rating: "8.2", summary: "Three very different LAPD officers investigate a mass murder in 1950s Los Angeles, uncovering widespread corruption.", keyTheme: "Facade vs reality, morality." },
+      { id: 99, title: "The Usual Suspects", year: 1995, director: "Bryan Singer", genre: "Crime", rating: "8.5", summary: "A sole survivor tells the police the elaborate story of a legendary crime lord named Keyser Söze.", keyTheme: "Deception, mythmaking." },
+      { id: 100, title: "Reservoir Dogs", year: 1992, director: "Quentin Tarantino", genre: "Crime", rating: "8.3", summary: "After a jewel heist goes terribly wrong, surviving criminals suspect one of them is an undercover informant.", keyTheme: "Paranoia, loyalty under fire." },
+      { id: 101, title: "Fargo", year: 1996, director: "Joel & Ethan Coen", genre: "Crime", rating: "8.1", summary: "A desperate car salesman hires two incompetent criminals to kidnap his wife, leading to chaos investigated by a pregnant chief of police.", keyTheme: "Greed vs quiet decency." },
+      { id: 102, title: "No Country for Old Men", year: 2007, director: "Joel & Ethan Coen", genre: "Crime", rating: "8.2", summary: "A hunter finds millions in stolen drug money, sparking a relentless chase by a psychopathic hitman.", keyTheme: "Inevitability of violence, changing times." },
+      { id: 103, title: "Dog Day Afternoon", year: 1975, director: "Sidney Lumet", genre: "Crime", rating: "8.0", summary: "A desperate man attempts to rob a Brooklyn bank, resulting in a media circus hostage situation.", keyTheme: "Anti-establishment rage, media frenzy." },
+      { id: 104, title: "Taxi Driver", year: 1976, director: "Martin Scorsese", genre: "Crime", rating: "8.2", summary: "An unstable mentally detached veteran drives a night taxi in New York, contemplating violent action against societal filth.", keyTheme: "Alienation, vigilante psychosis." },
+      { id: 105, title: "Heat", year: 1995, director: "Michael Mann", genre: "Crime", rating: "8.3", summary: "An obsessive LAPD detective pursues a disciplined career bank robber and his crew across Los Angeles.", keyTheme: "Professionalism, duality." },
+      { id: 106, title: "Prisoners", year: 2013, director: "Denis Villeneuve", genre: "Crime", rating: "8.1", summary: "When two young girls vanish, a desperate father takes the law into his own hands while a lead detective pursues clues.", keyTheme: "Desperation, vigilante morality." },
+      { id: 107, title: "Snatch", year: 2000, director: "Guy Ritchie", genre: "Crime", rating: "8.2", summary: "Unscrupulous boxing promoters, violent bookmakers, and Russian gangsters clash over a stolen diamond.", keyTheme: "Chaos, fortune." },
+      { id: 108, title: "Zodiac", year: 2007, director: "David Fincher", genre: "Crime", rating: "7.7", summary: "A cartoonist becomes obsessed with tracking down the Zodiac serial killer who haunts the San Francisco Bay Area.", keyTheme: "Obsession, unanswerable truth." },
+      { id: 109, title: "Sicario", year: 2015, director: "Denis Villeneuve", genre: "Crime", rating: "7.7", summary: "An idealist FBI agent is enlisted by a government task force to aid in the escalating war against drugs at the US-Mexico border.", keyTheme: "Moral compromise, border violence." },
+      { id: 110, title: "Nightcrawler", year: 2014, director: "Dan Gilroy", genre: "Crime", rating: "7.8", summary: "A driven man stumbles into the underground world of freelance crime journalism in Los Angeles, crossing ethical lines for ratings.", keyTheme: "Sociopathy, media sensationalism." },
+      { id: 111, title: "Drive", year: 2011, director: "Nicolas Winding Refn", genre: "Crime", rating: "7.8", summary: "A quiet Hollywood stunt driver who doubles as a getaway driver gets targeted by mobsters after helping a neighbor.", keyTheme: "Protective urge, latent violence." },
+      { id: 112, title: "American Gangster", year: 2007, director: "Ridley Scott", genre: "Crime", rating: "7.8", summary: "An honest detective works to bring down Harlem crime lord Frank Lucas who smuggles heroin into America.", keyTheme: "Capitalism, law enforcement ethics." },
+      { id: 113, title: "Gangs of New York", year: 2002, director: "Martin Scorsese", genre: "Crime", rating: "7.5", summary: "A young immigrant seeks revenge against the ruthless gang leader who killed his father in 1860s Manhattan.", keyTheme: "Tribalism, nation building." },
+      { id: 114, title: "A Bronx Tale", year: 1993, director: "Robert De Niro", genre: "Crime", rating: "7.8", summary: "A father becomes worried when a local mob boss befriends his young son in 1960s New York.", keyTheme: "Wasted talent, fatherly guidance." },
+      { id: 115, title: "Carlito's Way", year: 1993, director: "Brian De Palma", genre: "Crime", rating: "7.9", summary: "A former drug lord vows to go straight, but his loyalty to a corrupt lawyer pulls him back into crime.", keyTheme: "Inability to escape past." },
+      { id: 116, title: "The Irishman", year: 2019, director: "Martin Scorsese", genre: "Crime", rating: "7.8", summary: "A mob hitman recalls his possible involvement in the mysterious disappearance of labor union leader Jimmy Hoffa.", keyTheme: "Regret, aging in silence." },
+
+      // --- ANIMATION (29) ---
+      { id: 117, title: "Spirited Away", year: 2001, director: "Hayao Miyazaki", genre: "Animation", rating: "8.6", summary: "A young girl wanders into a spirit world ruled by witches and must work there to free her cursed parents.", keyTheme: "Maturation, loss of identity." },
+      { id: 118, title: "The Lion King", year: 1994, director: "Roger Allers & Rob Minkoff", genre: "Animation", rating: "8.5", summary: "A young lion prince flees his kingdom after his father is murdered, returning years later as an adult to reclaim his throne.", keyTheme: "Responsibility, cycle of life." },
+      { id: 119, title: "Toy Story", year: 1995, director: "John Lasseter", genre: "Animation", rating: "8.3", summary: "A cowboy doll feels threatened and jealous when a high-tech spaceman action figure arrives as the new favorite toy.", keyTheme: "Jealousy, friendship, purpose." },
+      { id: 120, title: "Toy Story 3", year: 2010, director: "Lee Unkrich", genre: "Animation", rating: "8.3", summary: "When their owner prepares for college, the toys are accidentally donated to a daycare center run by an authoritarian bear.", keyTheme: "Growing up, letting go." },
+      { id: 121, title: "WALL-E", year: 2008, director: "Andrew Stanton", genre: "Animation", rating: "8.4", summary: "In a distant wasteland future, a small waste-collecting robot inadvertently embarks on a space journey that decides humanity's fate.", keyTheme: "Environmental stewardship, human connection." },
+      { id: 122, title: "Up", year: 2009, director: "Pete Docter", genre: "Animation", rating: "8.3", summary: "An elderly widower ties thousands of balloons to his house to travel to South America, accidentally bringing a young boy along.", keyTheme: "Grief, unexpected adventure." },
+      { id: 123, title: "Spider-Man: Across the Spider-Verse", year: 2023, director: "Joaquim Dos Santos", genre: "Animation", rating: "8.6", summary: "Miles Morales catapults across the Multiverse where he encounters a team of Spider-People charged with protecting its existence.", keyTheme: "Writing your own story." },
+      { id: 124, title: "Finding Nemo", year: 2003, director: "Andrew Stanton", genre: "Animation", rating: "8.2", summary: "An overprotective clownfish journeys across the ocean to rescue his abducted son from a dentist's office aquarium.", keyTheme: "Overcoming fear, trusting children." },
+      { id: 125, title: "Inside Out", year: 2015, director: "Pete Docter", genre: "Animation", rating: "8.1", summary: "Personified emotions navigate a young girl's mind through a stressful move to a new city.", keyTheme: "Importance of sadness, emotional growth." },
+      { id: 126, title: "Coco", year: 2017, director: "Lee Unkrich", genre: "Animation", rating: "8.4", summary: "An aspiring musician enters the Land of the Dead to discover the secret behind his family's generational ban on music.", keyTheme: "Family heritage, memory." },
+      { id: 127, title: "Ratatouille", year: 2007, director: "Brad Bird", genre: "Animation", rating: "8.1", summary: "A talented rat who dreams of becoming a gourmet chef forms an alliance with a young garbage boy at a famous Paris restaurant.", keyTheme: "Passion, talent rising anywhere." },
+      { id: 128, title: "The Incredibles", year: 2004, director: "Brad Bird", genre: "Animation", rating: "8.0", summary: "A family of undercover superheroes living suburban lives are forced into action to save the world from a bitter inventor.", keyTheme: "Embracing uniqueness, family unity." },
+      { id: 129, title: "Monsters, Inc.", year: 2001, director: "Pete Docter", genre: "Animation", rating: "8.1", summary: "Top scarers in a monster city accidentally let a human child enter their world and discover laughter powers their city better than screams.", keyTheme: "Replacing fear with joy." },
+      { id: 130, title: "How to Train Your Dragon", year: 2010, director: "Dean DeBlois & Chris Sanders", genre: "Animation", rating: "8.1", summary: "A young Viking who aspires to hunt dragons befriends an injured Toothless dragon, learning they are misunderstood creatures.", keyTheme: "Empathy over prejudice." },
+      { id: 131, title: "Shrek", year: 2001, director: "Andrew Adamson & Vicki Jenson", genre: "Animation", rating: "7.9", summary: "An ogre's swamp is overrun by fairytale creatures, leading him to make a deal to rescue a princess for a ruthless lord.", keyTheme: "Self-acceptance, true beauty." },
+      { id: 132, title: "Shrek 2", year: 2004, director: "Andrew Adamson", genre: "Animation", rating: "7.3", summary: "Shrek and Fiona travel to Far Far Away to meet her parents, who are shocked to discover their daughter married an ogre.", keyTheme: "Acceptance across differences." },
+      { id: 133, title: "Fantastic Mr. Fox", year: 2009, director: "Wes Anderson", genre: "Animation", rating: "7.9", summary: "An urbane fox cannot resist returning to his farm-raiding ways, putting his family and community in danger.", keyTheme: "Wild nature vs domestic responsibility." },
+      { id: 134, title: "Isle of Dogs", year: 2018, director: "Wes Anderson", genre: "Animation", rating: "7.8", summary: "A boy travels to a trash island where all dogs have been exiled due to a canine flu outbreak to find his lost dog.", keyTheme: "Loyalty, standing up to tyranny." },
+      { id: 135, title: "Klaus", year: 2019, director: "Sergio Pablos", genre: "Animation", rating: "8.2", summary: "A selfish postman stationed in a frozen northern town befriends a reclusive toy maker, unwittingly starting the legend of Santa.", keyTheme: "Kindness sparking change." },
+      { id: 136, title: "Akira", year: 1988, director: "Katsuhiro Otomo", genre: "Animation", rating: "8.0", summary: "A secret military project endangers Neo-Tokyo when a biker gang member gains telekinetic psychic powers.", keyTheme: "Unchecked power, corruption." },
+      { id: 137, title: "Princess Mononoke", year: 1997, director: "Hayao Miyazaki", genre: "Animation", rating: "8.4", summary: "A prince searching for a cure to a curse finds himself in the middle of a war between forest gods and an iron mining town.", keyTheme: "Environment vs industrial progress." },
+      { id: 138, title: "My Neighbor Totoro", year: 1988, director: "Hayao Miyazaki", genre: "Animation", rating: "8.1", summary: "Two young sisters move to the country to be near their ailing mother and discover friendly spirits in the nearby forest.", keyTheme: "Childlike wonder, healing." },
+      { id: 139, title: "Howl's Moving Castle", year: 2004, director: "Hayao Miyazaki", genre: "Animation", rating: "8.2", summary: "A young woman cursed with an old body seeks shelter in the walking castle of a wizard undergoing an internal battle.", keyTheme: "Anti-war, self-worth." },
+      { id: 140, title: "Iron Giant", year: 1999, director: "Brad Bird", genre: "Animation", rating: "8.1", summary: "A young boy befriends a giant alien robot that a paranoid government agent wants destroyed during the Cold War.", keyTheme: "Free choice over nature, peace." },
+      { id: 141, title: "Beauty and the Beast", year: 1991, director: "Gary Trousdale & Kirk Wise", genre: "Animation", rating: "8.0", summary: "A young woman is held captive by a prince cursed into a monster, slowly learning to look past his exterior.", keyTheme: "Inner beauty, redemption." },
+      { id: 142, title: "Aladdin", year: 1992, director: "Ron Clements & John Musker", genre: "Animation", rating: "8.0", summary: "A street urchin uses a magical lamp with a genie inside to woo a princess while keeping it from an evil sorcerer.", keyTheme: "Being true to oneself." },
+      { id: 143, title: "Soul", year: 2020, director: "Pete Docter", genre: "Animation", rating: "8.0", summary: "A middle-school band teacher gets his big break in a jazz club, only to die and navigate the realm of souls to return.", keyTheme: "Life purpose, appreciating small moments." },
+      { id: 144, title: "Zootopia", year: 2016, director: "Byron Howard & Rich Moore", genre: "Animation", rating: "8.0", summary: "A rookie bunny cop and a cynical con-artist fox work together to uncover a conspiracy in a mammalian metropolis.", keyTheme: "Prejudice, systemic fear." },
+      { id: 145, title: "Coraline", year: 2009, director: "Henry Selick", genre: "Animation", rating: "7.7", summary: "A girl discovers a secret door in her home leading to an alternate world that hides dark secrets behind a facade.", keyTheme: "Appreciating real life, bravery." }
+    ];
+
+    // DOM References
+    const movieGrid = document.getElementById('movieGrid');
+    const searchInput = document.getElementById('searchInput');
+    const genreSelect = document.getElementById('genreSelect');
+    const countDisplay = document.getElementById('countDisplay');
+
+    // Rendering Function
+    function renderMovies(list) {
+      countDisplay.textContent = `${list.length} Movies`;
+
+      if (list.length === 0) {
+        movieGrid.innerHTML = `<div class="empty-state">No Hollywood films matched your search criteria.</div>`;
+        return;
+      }
+
+      movieGrid.innerHTML = list.map(m => `
+        <article class="card">
+          <div class="card-header">
+            <h2 class="card-title">${m.title}</h2>
+            <div class="card-meta">
+              <span class="badge">${m.genre}</span>
+              <span>${m.year}</span>
+              <span>★ ${m.rating}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div>
+              <div class="section-title">Plot Summary</div>
+              <div class="summary-section">${m.summary}</div>
+            </div>
+            <div>
+              <div class="section-title">Core Theme</div>
+              <div class="summary-section">${m.keyTheme}</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            Director: <strong>${m.director}</strong>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const query = searchInput.value.toLowerCase().trim();
+      const selectedGenre = genreSelect.value;
+
+      const filtered = movies.filter(m => {
+        const matchesQuery = m.title.toLowerCase().includes(query) ||
+                             m.director.toLowerCase().includes(query) ||
+                             m.summary.toLowerCase().includes(query) ||
+                             m.keyTheme.toLowerCase().includes(query);
+
+        const matchesGenre = selectedGenre === 'ALL' || m.genre === selectedGenre;
+
+        return matchesQuery && matchesGenre;
+      });
+
+      renderMovies(filtered);
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', applyFilters);
+    genreSelect.addEventListener('change', applyFilters);
+
+    // Initial Launch
+    renderMovies(movies);
+  </script>
+</body>
+</html>
