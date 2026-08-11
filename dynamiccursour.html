@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dynamic Theme & Cursor Effects</title>
+  <style>
+    /* =========================================================
+       1. CSS VARIABLES FOR THEMES
+       ========================================================= */
+    :root {
+      /* Default Theme: Dark */
+      --bg-color: #0d0f12;
+      --text-color: #f0f4f8;
+      --card-bg: #161b22;
+      --primary: #00f0ff;
+      --accent: #ff007f;
+      
+      /* Dynamic Cursor Colors */
+      --cursor-dot: #00f0ff;
+      --cursor-ring: rgba(0, 240, 255, 0.4);
+      --cursor-hover-ring: rgba(255, 0, 127, 0.6);
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f4f6f8;
+      --text-color: #1a202c;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --accent: #d97706;
+
+      --cursor-dot: #2563eb;
+      --cursor-ring: rgba(37, 99, 235, 0.3);
+      --cursor-hover-ring: rgba(217, 119, 6, 0.5);
+    }
+
+    [data-theme="cyberpunk"] {
+      --bg-color: #05050a;
+      --text-color: #00ff66;
+      --card-bg: #120428;
+      --primary: #ff0055;
+      --accent: #ffe600;
+
+      --cursor-dot: #ffe600;
+      --cursor-ring: rgba(255, 0, 85, 0.5);
+      --cursor-hover-ring: rgba(255, 230, 0, 0.8);
+    }
+
+    /* =========================================================
+       2. BASE STYLES & LAYOUT
+       ========================================================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      /* Hide default cursor on desktop screens */
+      cursor: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      overflow-x: hidden;
+    }
+
+    /* =========================================================
+       3. DYNAMIC CURSOR STYLES
+       ========================================================= */
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--cursor-dot);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+
+    .cursor-ring {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--cursor-ring);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: border-color 0.3s ease, width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
+    }
+
+    /* Hover effect over interactive elements */
+    body.hovered .cursor-dot {
+      transform: translate(-50%, -50%) scale(1.5);
+      background-color: var(--accent);
+    }
+
+    body.hovered .cursor-ring {
+      width: 55px;
+      height: 55px;
+      border-color: var(--cursor-hover-ring);
+      background-color: var(--cursor-ring);
+    }
+
+    /* Active click compression */
+    body.clicked .cursor-ring {
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    /* =========================================================
+       4. PAGE CONTENT & THEME CONTROLS
+       ========================================================= */
+    .container {
+      text-align: center;
+      max-width: 600px;
+      padding: 2rem;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--primary);
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    p {
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .theme-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--primary);
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: bold;
+      position: relative;
+    }
+
+    a::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    a:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor Elements -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- Page Content -->
+  <main class="container">
+    <h1>Dynamic Cursor Demo</h1>
+    <p>
+      Move your mouse around to feel the custom smooth physics. Hover over buttons or <a href="#">this link</a> to see the cursor react! Change the theme below to watch the cursor adapt its visual style.
+    </p>
+
+    <div class="theme-buttons">
+      <button onclick="setTheme('dark')" class="interactive">Dark Mode</button>
+      <button onclick="setTheme('light')" class="interactive">Light Mode</button>
+      <button onclick="setTheme('cyberpunk')" class="interactive">Cyberpunk</button>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       5. JAVASCRIPT: CURSOR PHYSICS & THEME SWITCHING
+       ========================================================= -->
+  <script>
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+
+    // Target mouse coordinates
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Smooth physics trailing coordinates
+    let ringX = 0;
+    let ringY = 0;
+
+    // Track mouse movement
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      // Inner dot responds instantly
+      dot.style.left = `${mouseX}px`;
+      dot.style.top = `${mouseY}px`;
+    });
+
+    // Smooth animation loop using Linear Interpolation (lerp)
+    function animate() {
+      // Smoothly interpolate ring position towards mouse position
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+
+      ring.style.left = `${ringX}px`;
+      ring.style.top = `${ringY}px`;
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Hover Effect Listeners for Interactive Elements
+    const interactiveElements = document.querySelectorAll('button, a, .interactive');
+
+    interactiveElements.forEach((el) => {
+      el.addEventListener('mouseenter', () => {
+        document.body.classList.add('hovered');
+      });
+      el.addEventListener('mouseleave', () => {
+        document.body.classList.remove('hovered');
+      });
+    });
+
+    // Click Compression Feedback
+    window.addEventListener('mousedown', () => {
+      document.body.classList.add('clicked');
+    });
+    window.addEventListener('mouseup', () => {
+      document.body.classList.remove('clicked');
+    });
+
+    // Theme Switcher Function
+    function setTheme(themeName) {
+      if (themeName === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', themeName);
+      }
+    }
+  </script>
+</body>
+</html>
