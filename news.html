@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One-Line News Ticker & 34-Day Archive</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --ticker-bg: #1e1b4b;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* --- Top One-Line News Ticker Bar --- */
+    .ticker-bar {
+      background: var(--ticker-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      height: 48px;
+      overflow: hidden;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .ticker-badge {
+      background: #ef4444;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0 16px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      z-index: 2;
+    }
+
+    .ticker-wrapper {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marquee 35s linear infinite;
+    }
+
+    .ticker-bar:hover .ticker-content {
+      animation-play-state: paused;
+    }
+
+    .ticker-item {
+      display: inline-block;
+      padding: 0 24px;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+
+    .ticker-item .date {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .ticker-item .tag {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-right: 8px;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* --- Main Container --- */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #a5b4fc, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* --- Form & Controls --- */
+    .controls {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .control-group label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    input, select, button {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+    }
+
+    /* --- Add News Form (Collapsible) --- */
+    .add-news-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .add-news-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* --- Archive Feed --- */
+    .news-feed {
+      display: flex;
+      flex-direction: flex-start;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .news-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .news-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    .news-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .news-title {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .news-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    .days-ago {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ONE-LINE NEWS TICKER -->
+  <div class="ticker-bar">
+    <div class="ticker-badge">🔴 Trending</div>
+    <div class="ticker-wrapper">
+      <div class="ticker-content" id="ticker-content">
+        <!-- Ticker items dynamically injected -->
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>34-Day News Archive & Live Ticker</h1>
+      <p>Continuous top news updates with rolling historical data storage.</p>
+    </header>
+
+    <!-- ADD NEW ITEM -->
+    <div class="add-news-card">
+      <h3>Add News Entry</h3>
+      <form id="add-news-form" class="form-grid">
+        <input type="text" id="news-headline" placeholder="Enter news headline..." required />
+        <select id="news-category">
+          <option value="Tech">Tech</option>
+          <option value="World">World</option>
+
+          <option value="Finance">Finance</option>
+          <option value="Science">Science</option>
+        </select>
+        <input type="date" id="news-date" required />
+        <button type="submit">Publish</button>
+      </form>
+    </div>
+
+    <!-- CONTROLS & FILTERING -->
+    <div class="controls">
+      <div class="control-group">
+        <label for="search-input">Search Headlines</label>
+        <input type="text" id="search-input" placeholder="Type keywords..." />
+      </div>
+
+      <div class="control-group">
+        <label for="category-filter">Category</label>
+        <select id="category-filter">
+          <option value="ALL">All Categories</option>
+          <option value="Tech">Tech</option>
+          <option value="World">World</option>
+          <option value="Finance">Finance</option>
+          <option value="Science">Science</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="day-range">Time Window</label>
+        <select id="day-range">
+          <option value="34">Last 34 Days (Full History)</option>
+          <option value="7">Last 7 Days</option>
+          <option value="1">Today Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ARCHIVE FEED -->
+    <div class="news-feed" id="news-feed">
+      <!-- News cards injected here -->
+    </div>
+  </div>
+
+  <script>
+    const MAX_DAYS = 34;
+
+    // Helper: Format date as YYYY-MM-DD
+    function formatDate(d) {
+      return d.toISOString().split('T')[0];
+    }
+
+    // Helper: Calculate days between target date and today
+    function getDaysAgo(dateStr) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const target = new Date(dateStr);
+      target.setHours(0, 0, 0, 0);
+      const diffTime = today - target;
+      return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // Seed mock data across the last 34 days
+    function generateSeedData() {
+      const categories = ['Tech', 'World', 'Finance', 'Science'];
+      const headlines = [
+        "Global Quantum Computing Breakthrough Announced",
+        "Central Banks Adjust Interest Rates Amid Inflation Shifts",
+        "Space Exploration Mission Discovers Water Ice on Mars",
+        "Next-Generation AI Model Achieves Human-Level Reasoning",
+        "Renewable Energy Output Hits All-Time High Worldwide",
+        "Major Cyber Defense Accord Signed by 30 Nations",
+        "Autonomous Electric Vehicles Approved for Urban Highways",
+        "Biotech Firm Advances Gene Therapy Clinical Trials",
+        "Global Markets Rally Following Quarterly Earnings Reports",
+        "Deep Sea Ecosystem Explored with Robotic Submersibles"
+      ];
+
+      const seed = [];
+      const now = new Date();
+
+      for (let i = 0; i < 34; i++) {
+        const dateObj = new Date(now);
+        dateObj.setDate(now.getDate() - i);
+        const dateStr = formatDate(dateObj);
+
+        // Add 1-2 news items per day
+        const headlineCount = (i % 2 === 0) ? 2 : 1;
+        for (let j = 0; j < headlineCount; j++) {
+          const headlineIdx = (i + j) % headlines.length;
+          const categoryIdx = (i + j) % categories.length;
+          seed.push({
+            id: Date.now() - (i * 86400000 + j * 1000),
+            headline: `${headlines[headlineIdx]} (Day ${i + 1})`,
+            category: categories[categoryIdx],
+            date: dateStr
+          });
+        }
+      }
+      return seed;
+    }
+
+    // Storage Manager (Enforces 34-day retention limit)
+    function loadNewsData() {
+      const stored = localStorage.getItem('news_history_34');
+      let data = stored ? JSON.parse(stored) : generateSeedData();
+
+      // Clean up records older than 34 days
+      data = data.filter(item => {
+        const daysAgo = getDaysAgo(item.date);
+        return daysAgo >= 0 && daysAgo < MAX_DAYS;
+      });
+
+      saveNewsData(data);
+      return data;
+    }
+
+    function saveNewsData(data) {
+      localStorage.setItem('news_history_34', JSON.stringify(data));
+    }
+
+    // Main App Logic
+    let newsData = loadNewsData();
+
+    // DOM Elements
+    const tickerContent = document.getElementById('ticker-content');
+    const newsFeed = document.getElementById('news-feed');
+    const searchInput = document.getElementById('search-input');
+    const categoryFilter = document.getElementById('category-filter');
+    const dayRange = document.getElementById('day-range');
+    const addForm = document.getElementById('add-news-form');
+    const newsDateInput = document.getElementById('news-date');
+
+    // Set max/min dates on date input (0 to 34 days ago)
+    const today = new Date();
+    const minDate = new Date();
+    minDate.setDate(today.getDate() - (MAX_DAYS - 1));
+    newsDateInput.max = formatDate(today);
+    newsDateInput.min = formatDate(minDate);
+    newsDateInput.value = formatDate(today);
+
+    // Render Ticker (Displays top 10 most recent news in continuous loop)
+    function renderTicker() {
+      const recent = [...newsData]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 10);
+
+      // Duplicate elements to create seamless marquee scrolling effect
+      const itemsHtml = recent.map(item => `
+        <div class="ticker-item">
+          <span class="tag">${item.category}</span>
+          <span class="date">${item.date}</span>
+          <span>${item.headline}</span>
+        </div>
+      `).join('');
+
+      // Repeat twice for infinite scroll seamless transition
+      tickerContent.innerHTML = itemsHtml + itemsHtml;
+    }
+
+    // Render Main Archive Feed
+    function renderFeed() {
+      const query = searchInput.value.toLowerCase().trim();
+      const selectedCat = categoryFilter.value;
+      const maxDaysAllowed = parseInt(dayRange.value, 10);
+
+      const filtered = newsData.filter(item => {
+        const daysAgo = getDaysAgo(item.date);
+        const matchesDate = daysAgo >= 0 && daysAgo < maxDaysAllowed;
+        const matchesCat = selectedCat === 'ALL' || item.category === selectedCat;
+        const matchesSearch = item.headline.toLowerCase().includes(query);
+
+        return matchesDate && matchesCat && matchesSearch;
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      if (filtered.length === 0) {
+        newsFeed.innerHTML = `<div class="empty-state">No news items found within the selected filters.</div>`;
+        return;
+      }
+
+      newsFeed.innerHTML = filtered.map(item => {
+        const daysAgo = getDaysAgo(item.date);
+        const label = daysAgo === 0 ? 'Today' : `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
+
+        return `
+          <div class="news-card">
+            <div class="news-info">
+              <div class="news-title">${item.headline}</div>
+              <div class="news-meta">
+                <span class="badge">${item.category}</span>
+                <span>${item.date}</span>
+                <span class="days-ago">• ${label}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Handle Adding New Items
+    addForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const headline = document.getElementById('news-headline').value.trim();
+      const category = document.getElementById('news-category').value;
+      const date = document.getElementById('news-date').value;
+
+      if (!headline || !date) return;
+
+      const newItem = {
+        id: Date.now(),
+        headline,
+        category,
+        date
+      };
+
+      newsData.unshift(newItem);
+
+      // Re-enforce 34-day limit & persist
+      newsData = newsData.filter(item => getDaysAgo(item.date) < MAX_DAYS);
+      saveNewsData(newsData);
+
+      // Reset form & update UI
+      document.getElementById('news-headline').value = '';
+      renderTicker();
+      renderFeed();
+    });
+
+    // Event Listeners for Filters
+    searchInput.addEventListener('input', renderFeed);
+    categoryFilter.addEventListener('change', renderFeed);
+    dayRange.addEventListener('change', renderFeed);
+
+    // Initial Execution
+    renderTicker();
+    renderFeed();
+  </script>
+</body>
+</html>
