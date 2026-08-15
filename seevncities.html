@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>World Clock Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .clock-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .clock-card:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+    }
+
+    .city-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .country-name {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .digital-time {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #38bdf8;
+      font-family: 'Courier New', Courier, monospace;
+      margin-bottom: 0.75rem;
+    }
+
+    .date-text {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    /* Highlight local time card */
+    .clock-card.primary {
+      border-color: #0284c7;
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Global World Clock</h1>
+    <p>Real-time tracking across 7 major world cities</p>
+  </header>
+
+  <main class="grid-container" id="clockGrid"></main>
+
+  <script>
+    // List of 7 cities with their IANA Time Zone identifiers
+    const cities = [
+      { name: "Tokyo", country: "Japan", timeZone: "Asia/Tokyo" },
+      { name: "Dubai", country: "UAE", timeZone: "Asia/Dubai" },
+      { name: "London", country: "United Kingdom", timeZone: "Europe/London" },
+      { name: "Paris", country: "France", timeZone: "Europe/Paris" },
+      { name: "New York", country: "United States", timeZone: "America/New_York" },
+      { name: "San Francisco", country: "United States", timeZone: "America/Los_Angeles" },
+      { name: "Sydney", country: "Australia", timeZone: "Australia/Sydney" }
+    ];
+
+    const gridContainer = document.getElementById("clockGrid");
+
+    // Build clock HTML cards dynamically
+    cities.forEach((city, index) => {
+      const card = document.createElement("div");
+      card.className = "clock-card";
+      
+      card.innerHTML = `
+        <div class="city-name">${city.name}</div>
+        <div class="country-name">${city.country}</div>
+        <div class="digital-time" id="time-${index}">--:--:--</div>
+        <div class="date-text" id="date-${index}">----</div>
+      `;
+      gridContainer.appendChild(card);
+    });
+
+    // Function to format time and date using Intl API
+    function updateClocks() {
+      const now = new Date();
+
+      cities.forEach((city, index) => {
+        // Format digital time
+        const timeFormatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: city.timeZone,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true
+        });
+
+        // Format date
+        const dateFormatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: city.timeZone,
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        });
+
+        document.getElementById(`time-${index}`).textContent = timeFormatter.format(now);
+        document.getElementById(`date-${index}`).textContent = dateFormatter.format(now);
+      });
+    }
+
+    // Run clock immediately, then tick every 1000ms (1 second)
+    updateClocks();
+    setInterval(updateClocks, 1000);
+  </script>
+</body>
+</html>
