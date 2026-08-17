@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grammar & Style Enhancer</title>
+  <!-- PDF.js library for extracting text from PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --grammar-err: #fecaca;
+      --grammar-border: #ef4444;
+      --style-err: #fef08a;
+      --style-border: #eab308;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 { color: var(--primary); font-size: 2rem; margin-bottom: 8px; }
+    header p { color: #64748b; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card h2 { font-size: 1.25rem; margin-bottom: 12px; color: #334155; }
+
+    .file-input-container {
+      margin-bottom: 12px;
+      padding: 12px;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      text-align: center;
+      background: #f1f5f9;
+    }
+
+    .file-input-container input { display: none; }
+    .file-label { cursor: pointer; color: var(--primary); font-weight: 600; }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      resize: vertical;
+      font-size: 1rem;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    textarea:focus { border-color: var(--primary); }
+
+    .btn {
+      margin-top: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: var(--primary-hover); }
+
+    .output-area {
+      min-height: 250px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafafa;
+      line-height: 1.8;
+      overflow-y: auto;
+      max-height: 350px;
+      white-space: pre-wrap;
+    }
+
+    /* Highlight classes */
+    .err-grammar {
+      background-color: var(--grammar-err);
+      border-bottom: 2px solid var(--grammar-border);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .err-style {
+      background-color: var(--style-err);
+      border-bottom: 2px solid var(--style-border);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .suggestions-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .suggestion-item {
+      padding: 10px;
+      border-left: 4px solid var(--primary);
+      background: #f1f5f9;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.9rem;
+    }
+
+    .suggestion-item .original { text-decoration: line-through; color: #ef4444; }
+    .suggestion-item .better { font-weight: bold; color: #16a34a; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Grammar & Language Enhancer</h1>
+    <p>Paste your text or upload a PDF to highlight errors and improve vocabulary.</p>
+  </header>
+
+  <div class="container">
+    <!-- Input Section -->
+    <div class="card">
+      <h2>Input Source</h2>
+      <div class="file-input-container">
+        <label class="file-label" for="fileInput">📁 Click to upload PDF or TXT file</label>
+        <input type="file" id="fileInput" accept=".pdf, .txt" />
+        <p id="fileName" style="font-size: 0.85rem; color: #64748b; margin-top: 4px;"></p>
+      </div>
+      <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
+      <button class="btn" onclick="analyzeText()">Analyze & Enhance</button>
+    </div>
+
+    <!-- Output Section -->
+    <div class="card">
+      <h2>Enhanced Output</h2>
+      <div id="outputArea" class="output-area">
+        Your highlighted suggestions will appear here after analysis...
+      </div>
+      
+      <h3 style="margin-top: 16px; font-size: 1rem;">Suggestions Breakdown</h3>
+      <div id="suggestionsList" class="suggestions-list">
+        <p style="color: #94a3b8; font-size: 0.9rem;">No analysis run yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PDF.js worker configuration
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    // File Upload Handler
+    document.getElementById('fileInput').addEventListener('change', async function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('fileName').textContent = `Loaded: ${file.name}`;
+
+      if (file.type === 'application/pdf') {
+        const fileReader = new FileReader();
+        fileReader.onload = async function () {
+          const typedarray = new Uint8Array(this.result);
+          const pdf = await pdfjsLib.getDocument(typedarray).promise;
+          let extractedText = '';
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const pageText = content.items.map(item => item.str).join(' ');
+            extractedText += pageText + '\n\n';
+          }
+          document.getElementById('textInput').value = extractedText;
+        };
+        fileReader.readAsArrayBuffer(file);
+      } else {
+        const text = await file.text();
+        document.getElementById('textInput').value = text;
+      }
+    });
+
+    // Language Rules and Dictionary for Enhancement
+    const rules = [
+      { pattern: /\b(teh)\b/gi, replacement: 'the', type: 'grammar', reason: 'Typo / Spelling error' },
+      { pattern: /\b(receive)\b/gi, replacement: 'receive', type: 'grammar', reason: 'Common spelling mistake' },
+      { pattern: /\b(i am writing to)\b/gi, replacement: 'I am reaching out to', type: 'style', reason: 'Better professional tone' },
+      { pattern: /\b(very good)\b/gi, replacement: 'exceptional', type: 'style', reason: 'Stronger vocabulary choice' },
+      { pattern: /\b(very bad)\b/gi, replacement: 'subpar', type: 'style', reason: 'Stronger vocabulary choice' },
+      { pattern: /\b(a lot of)\b/gi, replacement: 'numerous', type: 'style', reason: 'More formal phrasing' },
+      { pattern: /\b(you was)\b/gi, replacement: 'you were', type: 'grammar', reason: 'Subject-verb agreement error' },
+      { pattern: /\b(their is)\b/gi, replacement: 'there is', type: 'grammar', reason: 'Homophone usage error' }
+    ];
+
+    function analyzeText() {
+      const input = document.getElementById('textInput').value;
+      if (!input.trim()) {
+        alert('Please enter or upload some text first.');
+        return;
+      }
+
+      let highlightedHTML = input;
+      let suggestions = [];
+
+      rules.forEach(rule => {
+        highlightedHTML = highlightedHTML.replace(rule.pattern, (match) => {
+          suggestions.push({
+            original: match,
+            better: rule.replacement,
+            reason: rule.reason,
+            type: rule.type
+          });
+
+          const cssClass = rule.type === 'grammar' ? 'err-grammar' : 'err-style';
+          return `<span class="${cssClass}" title="${rule.reason}: Replace '${match}' with '${rule.replacement}'">${match}</span>`;
+        });
+      });
+
+      // Display Highlighted Text
+      document.getElementById('outputArea').innerHTML = highlightedHTML || input;
+
+      // Display Suggestions Breakdown
+      const suggestionsContainer = document.getElementById('suggestionsList');
+      if (suggestions.length === 0) {
+        suggestionsContainer.innerHTML = '<p style="color: #16a34a; font-weight: 500;">Great job! No basic issues found.</p>';
+      } else {
+        suggestionsContainer.innerHTML = suggestions.map(s => `
+          <div class="suggestion-item">
+            <span class="original">${s.original}</span> ➔ <span class="better">${s.better}</span>
+            <div style="color: #64748b; font-size: 0.8rem; margin-top: 2px;">${s.reason} (${s.type})</div>
+          </div>
+        `).join('');
+      }
+    }
+  </script>
+</body>
+</html>
