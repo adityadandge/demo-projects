@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate AI Tools Directory | Free vs Paid AI Solutions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-secondary: #06b6d4;
+            --free-badge-bg: #10b9811f;
+            --free-badge-text: #34d399;
+            --paid-badge-bg: #f59e0b1f;
+            --paid-badge-text: #fbbf24;
+            --border-color: #334155;
+            --gradient-accent: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        /* Search & Filter Bar */
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-wrapper input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .categories-filter {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            max-width: 100%;
+        }
+
+        .filter-btn {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--gradient-accent);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .card-title-group h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card-title-group p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .tools-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .tool-box {
+            padding: 12px 16px;
+            border-radius: 10px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tool-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-free {
+            background-color: var(--free-badge-bg);
+            color: var(--free-badge-text);
+        }
+
+        .badge-paid {
+            background-color: var(--paid-badge-bg);
+            color: var(--paid-badge-text);
+        }
+
+        .tool-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AI Tools Navigator</h1>
+        <p>Discover the top free and paid Artificial Intelligence options across 15 popular workflows & everyday tasks.</p>
+    </header>
+
+    <div class="controls">
+        <div class="search-wrapper">
+            <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search tasks or tool names (e.g., Grammar, Booking)..." onkeyup="filterTools()">
+        </div>
+    </div>
+
+    <main class="grid-container" id="toolsGrid">
+
+        <!-- 1. Documentation & Technical Writing -->
+        <div class="card" data-category="writing">
+            <div class="card-header">
+                <div class="card-icon">📝</div>
+                <div class="card-title-group">
+                    <h2>Documentation & Tech Writing</h2>
+                    <p>API docs, technical guides & knowledge bases</p>
+                </div>
+            </div>
+            <p class="card-description">Automate code documentation, structure technical manuals, and maintain organized team wikis efficiently.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Mintlify</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Auto-generates clean, interactive documentation directly from code comments and repositories.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">GitBook AI</span>
+                        <span class="badge badge-paid">Paid / Enterprise</span>
+                    </div>
+                    <div class="tool-desc">Comprehensive team documentation workspace with advanced AI editing, search, and insights.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Reading & PDF Summarization -->
+        <div class="card" data-category="reading">
+            <div class="card-header">
+                <div class="card-icon">📚</div>
+                <div class="card-title-group">
+                    <h2>Reading & PDF Analysis</h2>
+                    <p>Research papers, long articles & PDF summaries</p>
+                </div>
+            </div>
+            <p class="card-description">Extract quick summaries, ask questions directly to PDF documents, and summarize dense research.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">ChatPDF</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Upload any PDF and chat with it for free to extract key information and fast summaries.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Humata AI</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Powerful document query engine with citations, multi-file analysis, and advanced research tools.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Grammar & Style Checking -->
+        <div class="card" data-category="writing">
+            <div class="card-header">
+                <div class="card-icon">✍️</div>
+                <div class="card-title-group">
+                    <h2>Grammar & Style Checking</h2>
+                    <p>Proofreading, tone adjustment & clarity</p>
+                </div>
+            </div>
+            <p class="card-description">Eliminate typos, refine your sentence structure, and ensure professional communication standards.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">LanguageTool</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Open-source multilingual grammar, style, and spell checker supporting over 30 languages.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Grammarly Premium</span>
+                        <span class="badge badge-paid">Paid / Premium</span>
+                    </div>
+                    <div class="tool-desc">Deep tone adjustments, plagiarism checking, advanced rewrite suggestions, and team style guides.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Booking & Travel Planning -->
+        <div class="card" data-category="productivity">
+            <div class="card-header">
+                <div class="card-icon">✈️</div>
+                <div class="card-title-group">
+                    <h2>Booking & Travel Planning</h2>
+                    <p>Itineraries, flight booking & hotel discovery</p>
+                </div>
+            </div>
+            <p class="card-description">Build personalized travel itineraries, find cheap flight deals, and discover local spots automatically.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Roam Around (iPlan.ai)</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Generates complete day-by-day travel itineraries and destination guides instantly for free.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">GuideGeek / Layla AI</span>
+                        <span class="badge badge-paid">Paid / Freemium</span>
+                    </div>
+                    <div class="tool-desc">Real-time WhatsApp travel assistant with direct integration to flight and hotel booking engines.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Coding & Development -->
+        <div class="card" data-category="coding">
+            <div class="card-header">
+                <div class="card-icon">💻</div>
+                <div class="card-title-group">
+                    <h2>Coding & Software Development</h2>
+                    <p>Autocompletion, code generation & debugging</p>
+                </div>
+            </div>
+            <p class="card-description">Accelerate software engineering with real-time code completion, refactoring, and bug detection.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Codeium</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Ultra-fast free code completion and inline chat supporting 70+ programming languages.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">GitHub Copilot / Cursor</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Industry-standard IDE integration with deep multi-file contextual code understanding and generation.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Graphic Design & Image Generation -->
+        <div class="card" data-category="media">
+            <div class="card-header">
+                <div class="card-icon">🎨</div>
+                <div class="card-title-group">
+                    <h2>Graphic & Image Generation</h2>
+                    <p>AI artwork, marketing graphics & assets</p>
+                </div>
+            </div>
+            <p class="card-description">Generate custom artwork, social media graphics, and photo-realistic illustrations from text prompts.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Leonardo.ai</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Generous daily free credits with fine-tuned models for game assets, art, and illustrations.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Midjourney</span>
+                        <span class="badge badge-paid">Paid Only</span>
+                    </div>
+                    <div class="tool-desc">Highest visual quality and photorealism available, preferred by professional artists and designers.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Audio & Speech Transcribing -->
+        <div class="card" data-category="audio">
+            <div class="card-header">
+                <div class="card-icon">🎙️</div>
+                <div class="card-title-group">
+                    <h2>Audio & Speech Transcription</h2>
+                    <p>Voice-to-text, meeting notes & audio cleanup</p>
+                </div>
+            </div>
+            <p class="card-description">Transcribe meetings, podcasts, and audio files accurately into actionable notes and text transcripts.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">OpenAI Whisper (Local)</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Completely free, open-source, multi-lingual speech recognition system with incredible precision.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Otter.ai / Descript</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Live meeting assistant with speaker identification, automated summaries, and timeline editing.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Video Creation & Editing -->
+        <div class="card" data-category="media">
+            <div class="card-header">
+                <div class="card-icon">🎬</div>
+                <div class="card-title-group">
+                    <h2>Video Creation & Editing</h2>
+                    <p>Text-to-video, auto-editing & avatars</p>
+                </div>
+            </div>
+            <p class="card-description">Create engaging short-form video content, generate AI spokespersons, and automate video editing.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">CapCut AI Tools</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Comprehensive suite for auto-captions, background removal, and video enhancement.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Runway Gen-2 / HeyGen</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Advanced generative video effects, cinematic text-to-video synthesis, and photorealistic avatars.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Web Research & Information Gathering -->
+        <div class="card" data-category="reading">
+            <div class="card-header">
+                <div class="card-icon">🔍</div>
+                <div class="card-title-group">
+                    <h2>Web Research & Search</h2>
+                    <p>Real-time internet search & synthesis</p>
+                </div>
+            </div>
+            <p class="card-description">Get direct, cited answers to complex questions without digging through pages of search results.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Perplexity AI</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Conversational search engine delivering accurate, up-to-date answers complete with web citations.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Perplexity Pro</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Access to Claude 3.5, GPT-4o, unlimited deep research queries, and document uploads.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. Data Analysis & Spreadsheets -->
+        <div class="card" data-category="productivity">
+            <div class="card-header">
+                <div class="card-icon">📊</div>
+                <div class="card-title-group">
+                    <h2>Data Analysis & Spreadsheets</h2>
+                    <p>Excel formulas, data viz & insights</p>
+                </div>
+            </div>
+            <p class="card-description">Clean raw data, generate complex Excel/Google Sheets formulas, and plot interactive analytical charts.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Formula Bot</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Convert plain English instructions into complex Excel and Google Sheets formulas instantly.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">ChatGPT Plus (Data Analyst)</span>
+                        <span class="badge badge-paid">Paid / Plus</span>
+                    </div>
+                    <div class="tool-desc">Execute Python code on uploaded datasets to perform statistical analysis and build plots.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. Presentation & Slides Creation -->
+        <div class="card" data-category="productivity">
+            <div class="card-header">
+                <div class="card-icon">🖥️</div>
+                <div class="card-title-group">
+                    <h2>Presentation & Slides Creation</h2>
+                    <p>Pitch decks, slide layouts & storytelling</p>
+                </div>
+            </div>
+            <p class="card-description">Generate full presentation decks with polished slide layouts and structured content in minutes.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Gamma App</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Generates beautiful interactive pitch decks, documents, and web pages with simple text prompts.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Beautiful.ai</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Smart slide templates that automatically adjust layout as you add content, designed for enterprise.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12. Task Scheduling & Calendar Management -->
+        <div class="card" data-category="productivity">
+            <div class="card-header">
+                <div class="card-icon">📅</div>
+                <div class="card-title-group">
+                    <h2>Task Scheduling & Calendar</h2>
+                    <p>Time blocking, meeting scheduling & focus</p>
+                </div>
+            </div>
+            <p class="card-description">Optimize your daily schedule, automate meeting bookings, and balance work-life time blocks.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Clockwise</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Free intelligent calendar assistant that creates uninterrupted focus time for individuals.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Motion (UseMotion)</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Automatically plans your day, rearranges tasks based on priority, and coordinates calendar bookings.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13. Email Management & Inbox Drafting -->
+        <div class="card" data-category="productivity">
+            <div class="card-header">
+                <div class="card-icon">✉️</div>
+                <div class="card-title-group">
+                    <h2>Email Drafting & Inbox Control</h2>
+                    <p>Inbox zero, auto-replies & cold email outreach</p>
+                </div>
+            </div>
+            <p class="card-description">Summarize long email threads, draft polite responses, and automate repetitive outreach sequences.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Shortwave</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">AI-powered Gmail client that summarizes email threads and drafts intelligent quick replies.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Superhuman AI</span>
+                        <span class="badge badge-paid">Paid / Enterprise</span>
+                    </div>
+                    <div class="tool-desc">Ultra-fast email experience featuring AI voice drafting, priority sorting, and auto-followups.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14. Mind Mapping & Brainstorming -->
+        <div class="card" data-category="productivity">
+            <div class="card-header">
+                <div class="card-icon">🧠</div>
+                <div class="card-title-group">
+                    <h2>Mind Mapping & Ideas</h2>
+                    <p>Concept mapping, ideation & visual planning</p>
+                </div>
+            </div>
+            <p class="card-description">Transform unstructured thoughts into structured visual diagrams, flowcharts, and creative concepts.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Whimsical AI</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Generates instant mind maps and flowcharts to expand on central ideas during brainstorming.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">Miro AI</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Enterprise collaborative whiteboarding with built-in AI cluster analysis, summarization, and task mapping.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15. Language Learning & Translation -->
+        <div class="card" data-category="reading">
+            <div class="card-header">
+                <div class="card-icon">🌐</div>
+                <div class="card-title-group">
+                    <h2>Language Translation & Learning</h2>
+                    <p>Contextual translation & real-time conversation</p>
+                </div>
+            </div>
+            <p class="card-description">Translate text while maintaining original nuance, practice conversational speaking, and learn new tongues.</p>
+            <div class="tools-comparison">
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">DeepL Translator</span>
+                        <span class="badge badge-free">Best Free Plan</span>
+                    </div>
+                    <div class="tool-desc">Widely regarded as the most accurate and natural-sounding free neural machine translation service.</div>
+                </div>
+                <div class="tool-box">
+                    <div class="tool-box-header">
+                        <span class="tool-name">TalkPal AI / DeepL Pro</span>
+                        <span class="badge badge-paid">Paid / Pro</span>
+                    </div>
+                    <div class="tool-desc">Interactive AI language tutor offering natural voice conversations, roleplays, and personalized feedback.</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function filterTools() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
